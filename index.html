@@ -1,1475 +1,1298 @@
 bash
 
-cat > /tmp/build_forum.py << 'BUILDEOF'
-exec(open('/tmp/b64imgs.py').read())
-
-HTML = f'''<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radium ZONE-21 — Forum</title>
-<style>
-*{{margin:0;padding:0;box-sizing:border-box}}
-:root{{
---bg:#0c0c0e;--bg2:#13131a;--bg3:#1a1a24;--bg4:#22222e;--bg5:#2a2a38;
---red:#d93030;--red2:#ff4444;--red-dim:rgba(217,48,48,.12);
---green:#27ae60;--yellow:#e67e22;--blue:#2980b9;
---text:#dddde8;--text2:#a0a0b8;--text3:#606078;
---border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
---gold:#e8b840;--purple:#8e44ad;--orange:#d35400;
---input-bg:#0f0f16;--sidebar:220px;
-}}
-html,body{{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px}}
-::-webkit-scrollbar{{width:5px;height:5px}}
-::-webkit-scrollbar-track{{background:transparent}}
-::-webkit-scrollbar-thumb{{background:var(--bg5);border-radius:3px}}
-/* ROLES */
-.role{{display:inline-flex;align-items:center;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.4px;white-space:nowrap}}
-.r-fonda{{background:rgba(217,48,48,.25);color:#ff9999;border:1px solid rgba(217,48,48,.5)}}
-.r-cofonda{{background:rgba(180,30,30,.2);color:#ffaaaa;border:1px solid rgba(180,30,30,.4)}}
-.r-manager{{background:rgba(150,20,20,.2);color:#ffbbbb;border:1px solid rgba(150,20,20,.35)}}
-.r-admin{{background:rgba(41,128,185,.2);color:#88ccff;border:1px solid rgba(41,128,185,.4)}}
-.r-modo{{background:rgba(39,174,96,.2);color:#88ffaa;border:1px solid rgba(39,174,96,.4)}}
-.r-devmap{{background:rgba(211,84,0,.2);color:#ffaa66;border:1px solid rgba(211,84,0,.4)}}
-.r-script{{background:rgba(211,84,0,.18);color:#ffbb77;border:1px solid rgba(211,84,0,.35)}}
-.r-animateur{{background:rgba(142,68,173,.2);color:#cc88ff;border:1px solid rgba(142,68,173,.4)}}
-.r-acteur{{background:rgba(120,50,160,.18);color:#dd99ff;border:1px solid rgba(120,50,160,.35)}}
-.r-resp{{background:rgba(100,60,180,.2);color:#aaaaff;border:1px solid rgba(100,60,180,.4)}}
-.r-vip{{background:rgba(232,184,64,.15);color:#f0c040;border:1px solid rgba(232,184,64,.4)}}
-.r-poto{{background:rgba(41,128,185,.12);color:#7ab0d8;border:1px solid rgba(41,128,185,.3)}}
-.r-membre{{background:rgba(255,255,255,.06);color:#9898b0;border:1px solid rgba(255,255,255,.1)}}
-.r-banni{{background:rgba(100,0,0,.3);color:#ff6666;border:1px solid rgba(100,0,0,.5)}}
-/* TAGS */
-.tag{{display:inline-flex;align-items:center;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:700}}
-.tw{{background:#2a2a00;color:#ffee44;border:1px solid #666600}}
-.tt{{background:#002030;color:#44aaff;border:1px solid #005580}}
-.ta{{background:#002200;color:#44ee44;border:1px solid #005500}}
-.tr{{background:#2a0000;color:#ff5555;border:1px solid #660000}}
-/* AVATAR BORDERS */
-.av-b-fonda{{box-shadow:0 0 0 2px #d93030,0 0 10px rgba(217,48,48,.35)}}
-.av-b-cofonda{{box-shadow:0 0 0 2px #c02020}}
-.av-b-manager{{box-shadow:0 0 0 2px #a01818}}
-.av-b-admin{{box-shadow:0 0 0 2px #2980b9}}
-.av-b-modo{{box-shadow:0 0 0 2px #27ae60}}
-.av-b-devmap{{box-shadow:0 0 0 2px #d35400}}
-.av-b-script{{box-shadow:0 0 0 2px #c04800}}
-.av-b-animateur{{box-shadow:0 0 0 2px #8e44ad}}
-.av-b-acteur{{box-shadow:0 0 0 2px #7a3aaa}}
-.av-b-resp{{box-shadow:0 0 0 2px #6440b0}}
-.av-b-vip{{box-shadow:0 0 0 2px #e8b840}}
-.av-b-poto{{box-shadow:0 0 0 1px rgba(41,128,185,.5)}}
-.av-b-membre{{box-shadow:0 0 0 1px rgba(255,255,255,.1)}}
-.av-b-banni{{box-shadow:0 0 0 2px #660000}}
-/* LAYOUT */
-.app{{display:flex;height:100vh;overflow:hidden}}
-.sidebar{{width:var(--sidebar);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}}
-.sidebar-logo{{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0}}
-.sidebar-logo img{{width:32px;height:32px;object-fit:contain}}
-.sidebar-logo-text{{font-weight:800;font-size:13px;letter-spacing:1.5px;line-height:1.2}}
-.sidebar-logo-text span{{color:var(--red)}}
-.sidebar-nav{{flex:1;overflow-y:auto;padding:8px 0}}
-.sidebar-section{{padding:14px 16px 4px;font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;display:flex;align-items:center;gap:6px}}
-.sidebar-section::after{{content:'';flex:1;height:1px;background:var(--border)}}
-.sidebar-item{{display:flex;align-items:center;gap:9px;padding:7px 16px;cursor:pointer;transition:background .15s;color:var(--text2);font-size:13px;position:relative}}
-.sidebar-item:hover{{background:var(--bg3);color:var(--text)}}
-.sidebar-item.active{{background:rgba(217,48,48,.1);color:var(--text);border-left:2px solid var(--red)}}
-.sidebar-item svg{{width:15px;height:15px;flex-shrink:0;opacity:.7}}
-.sidebar-item.active svg{{opacity:1}}
-.sidebar-badge{{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}}
-.sidebar-user{{padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:9px;cursor:pointer;transition:background .15s}}
-.sidebar-user:hover{{background:var(--bg3)}}
-.sidebar-user-name{{font-weight:700;font-size:12px;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
-.main-content{{flex:1;display:flex;flex-direction:column;overflow:hidden}}
-.topbar{{height:48px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;background:var(--bg2)}}
-.topbar-title{{font-weight:800;font-size:15px;flex:1;color:var(--text)}}
-.tb-icon-btn{{width:32px;height:32px;border-radius:6px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);transition:all .2s;position:relative}}
-.tb-icon-btn:hover{{background:var(--bg4);color:var(--text)}}
-.tb-icon-btn svg{{width:16px;height:16px}}
-.notif-badge{{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 4px;border-radius:8px;min-width:16px;text-align:center;line-height:14px;border:2px solid var(--bg2)}}
-.content-area{{flex:1;overflow-y:auto;overflow-x:hidden}}
-/* FORUM HOME */
-.forum-home{{padding:24px}}
-.forum-banner{{border-radius:12px;overflow:hidden;position:relative;margin-bottom:24px;height:200px;background:url("{BG}") center/cover no-repeat}}
-.forum-banner-overlay{{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.72) 0%,rgba(12,12,14,.35) 100%);display:flex;align-items:center;padding:28px}}
-.banner-text h1{{font-size:28px;font-weight:900;letter-spacing:3px;line-height:1}}
-.banner-text h1 span{{color:var(--red)}}
-.banner-text p{{font-size:13px;color:rgba(255,255,255,.6);margin-top:4px}}
-.banner-badge{{display:inline-flex;align-items:center;gap:6px;background:rgba(232,184,64,.15);border:1px solid rgba(232,184,64,.4);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--gold);margin-top:8px}}
-.stats-row{{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}}
-.stat-card{{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;flex:1;min-width:100px}}
-.stat-n{{font-size:22px;font-weight:800;line-height:1}}
-.stat-l{{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}}
-.cat-block{{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}}
-.cat-head{{padding:12px 18px;border-bottom:1px solid var(--border);background:linear-gradient(90deg,var(--bg3),var(--bg2))}}
-.cat-head-name{{font-weight:800;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:8px}}
-.cat-head-name::before{{content:'';width:3px;height:13px;background:var(--red);border-radius:2px;flex-shrink:0}}
-.ch-row{{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:11px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}}
-.ch-row:last-child{{border-bottom:none}}
-.ch-row:hover{{background:var(--bg3)}}
-.ch-icon-wrap{{width:36px;height:36px;border-radius:8px;background:var(--bg4);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text3)}}
-.ch-icon-wrap svg{{width:16px;height:16px}}
-.ch-name{{font-weight:700;font-size:13px;color:var(--text)}}
-.ch-last{{font-size:11px;color:var(--text3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
-.ch-badge{{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}}
-/* POSTS */
-.post-list-wrap{{padding:20px}}
-.post-card{{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start}}
-.post-card:hover{{border-color:rgba(217,48,48,.35);background:var(--bg3)}}
-.msg-av{{border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;overflow:hidden}}
-.msg-av img{{width:100%;height:100%;object-fit:cover;border-radius:50%}}
-/* DISCUSSION */
-.disc-wrap{{display:flex;flex-direction:column;height:100%}}
-.disc-messages{{flex:1;overflow-y:auto;padding:16px 20px}}
-.msg-item{{display:flex;gap:12px;margin-bottom:16px;position:relative}}
-.msg-item:hover .msg-actions-btn{{opacity:1}}
-.msg-body{{flex:1;min-width:0}}
-.msg-head{{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px}}
-.msg-author{{font-weight:700;font-size:13px}}
-.msg-time{{font-size:11px;color:var(--text3)}}
-.msg-text{{font-size:13px;line-height:1.6;color:var(--text2);word-break:break-word}}
-.msg-text strong{{color:var(--text);font-weight:700}}
-.msg-reply-ref{{background:var(--bg4);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:6px 10px;margin-bottom:6px;font-size:11px;color:var(--text3);cursor:pointer}}
-.msg-reply-ref:hover{{background:var(--bg5)}}
-.msg-reply-ref .ref-author{{font-weight:700;color:var(--text2);margin-bottom:2px}}
-.ping-highlight{{background:rgba(232,184,64,.12);border:1px solid rgba(232,184,64,.25);border-radius:4px;padding:0 3px;color:var(--gold);font-weight:700;cursor:pointer}}
-.msg-actions-btn{{position:absolute;top:0;right:0;opacity:0;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:16px;color:var(--text2);line-height:1}}
-.msg-menu{{position:absolute;top:24px;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;overflow:hidden;z-index:50;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,.6)}}
-.mm-item{{padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:9px;transition:background .1s}}
-.mm-item:hover{{background:var(--bg3)}}
-.mm-item.danger{{color:#ff7777}}
-.mm-item.danger:hover{{background:rgba(217,48,48,.12)}}
-.mm-item svg{{width:14px;height:14px;opacity:.8}}
-.disc-input{{flex-shrink:0;padding:12px 20px;border-top:1px solid var(--border);background:var(--bg2)}}
-.reply-indicator{{background:var(--bg4);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:6px 12px;margin-bottom:8px;font-size:11px;color:var(--text3);display:flex;align-items:center;justify-content:space-between}}
-.editor-wrap{{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;overflow:hidden;transition:border-color .2s}}
-.editor-wrap:focus-within{{border-color:rgba(217,48,48,.4)}}
-.editor-toolbar{{background:var(--bg4);border-bottom:1px solid var(--border);padding:5px 10px;display:flex;align-items:center;gap:1px;flex-wrap:wrap}}
-.tb-btn{{background:transparent;border:1px solid transparent;color:var(--text3);width:28px;height:26px;border-radius:4px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .1s;font-family:inherit}}
-.tb-btn:hover{{background:var(--bg3);border-color:var(--border2);color:var(--text)}}
-.tb-sep{{width:1px;height:16px;background:var(--border2);margin:0 3px}}
-.editor-body{{padding:10px 14px;min-height:60px;max-height:200px;overflow-y:auto;color:var(--text);font-size:13px;line-height:1.6;outline:none;background:var(--bg3)}}
-.editor-body[contenteditable]:empty:before{{content:attr(data-placeholder);color:var(--text3)}}
-.editor-footer{{background:var(--bg4);border-top:1px solid var(--border);padding:6px 12px;display:flex;align-items:center;justify-content:space-between}}
-/* POST FULL */
-.post-full-wrap{{padding:24px}}
-.pf-title{{font-weight:900;font-size:22px;line-height:1.3;color:var(--text);margin-bottom:12px}}
-.pf-body{{font-size:14px;line-height:1.7;color:var(--text2);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px}}
-.reply-card{{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}}
-/* PROFILE */
-.profile-page{{padding:24px;max-width:700px;margin:0 auto}}
-.prof-banner{{background:linear-gradient(135deg,var(--red-dim),var(--bg3));border-radius:12px;height:120px;position:relative;margin-bottom:50px;border:1px solid var(--border)}}
-.prof-av-wrap{{position:absolute;bottom:-36px;left:24px}}
-.prof-av{{width:72px;height:72px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;border:3px solid var(--bg);overflow:hidden}}
-.prof-av img{{width:100%;height:100%;object-fit:cover}}
-/* AUTH / LOGIN GATE */
-.login-gate{{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}}
-.login-gate-box{{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:32px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.7)}}
-.login-logo{{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;gap:12px}}
-.login-logo img{{width:80px;height:80px;object-fit:contain}}
-.login-logo-text{{font-weight:900;font-size:22px;letter-spacing:3px}}
-.login-logo-text span{{color:var(--red)}}
-.auth-tabs{{display:flex;background:var(--bg3);border-radius:8px;padding:3px;margin-bottom:20px}}
-.auth-tab{{flex:1;padding:9px;text-align:center;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px;color:var(--text3);transition:all .2s}}
-.auth-tab.active{{background:var(--red);color:#fff}}
-/* ADMIN */
-.admin-page{{padding:24px;max-width:900px}}
-.admin-header{{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}}
-.admin-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}}
-.admin-card-btn{{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;text-align:center}}
-.admin-card-btn:hover{{border-color:rgba(217,48,48,.5);background:var(--bg3)}}
-.admin-card-btn svg{{width:22px;height:22px;margin:0 auto 8px;display:block;opacity:.7}}
-.admin-card-btn-label{{font-weight:700;font-size:12px;color:var(--text)}}
-.member-table{{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}}
-.mt-row{{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border)}}
-.mt-row:last-child{{border-bottom:none}}
-.mt-row:hover{{background:var(--bg3)}}
-.mt-btn{{padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid;transition:all .15s}}
-.mt-btn-ban{{background:rgba(217,48,48,.15);color:#ff8888;border-color:rgba(217,48,48,.4)}}
-.mt-btn-ban:hover{{background:rgba(217,48,48,.25)}}
-.mt-btn-role{{background:var(--bg3);color:var(--text2);border-color:var(--border2)}}
-.mt-btn-unban{{background:rgba(39,174,96,.15);color:#88ff88;border-color:rgba(39,174,96,.4)}}
-/* LOGS */
-.log-entry{{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;color:var(--text2)}}
-/* INPUTS */
-.il{{margin-bottom:12px}}
-.il-label{{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:700}}
-.if{{width:100%;background:var(--input-bg);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:border-color .2s}}
-.if:focus{{border-color:rgba(217,48,48,.5)}}
-.if::placeholder{{color:var(--text3)}}
-textarea.if{{resize:none;min-height:80px;line-height:1.5}}
-select.if{{cursor:pointer}}
-/* BUTTONS */
-.btn-red{{background:var(--red);color:#fff;border:none;padding:9px 20px;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}}
-.btn-red:hover{{background:var(--red2)}}
-.btn-green{{background:var(--green);color:#fff;border:none;padding:9px 20px;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}}
-.btn-outline{{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:9px 18px;border-radius:7px;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}}
-.btn-outline:hover{{border-color:rgba(217,48,48,.5)}}
-.btn-sm{{padding:6px 14px;font-size:12px}}
-/* MODAL */
-.mo{{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}}
-.mo.show{{display:flex}}
-.mo-box{{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.7)}}
-.mo-title{{font-weight:800;font-size:17px;color:var(--text);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}}
-.mo-close{{color:var(--text3);cursor:pointer;font-size:20px;padding:0 4px;line-height:1}}
-.mo-close:hover{{color:var(--text)}}
-.tag-sel-row{{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}}
-.tsel{{padding:5px 12px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);transition:all .2s;color:var(--text2)}}
-.tsel.sel{{border-color:var(--red);color:var(--text);background:rgba(217,48,48,.15)}}
-/* TOAST */
-.toast{{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;z-index:600;opacity:0;transition:opacity .3s;pointer-events:none;color:var(--text);box-shadow:0 4px 24px rgba(0,0,0,.5);display:flex;align-items:center;gap:8px}}
-.toast.show{{opacity:1}}
-/* BAN SCREEN */
-
-/* BOT */
-.bot-msg{{background:rgba(41,128,185,.06);border:1px solid rgba(41,128,185,.2);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;gap:12px}}
-.bot-av{{width:38px;height:38px;border-radius:50%;background:#0d2540;border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}}
-/* BOT COMMANDS */
-.bot-embed{{background:var(--bg3);border:1px solid var(--border2);border-left:4px solid var(--blue);border-radius:0 8px 8px 0;padding:12px 14px;margin-top:6px;font-size:12px}}
-.bot-embed-title{{font-weight:800;color:var(--text);margin-bottom:6px}}
-.bot-embed-field{{margin-bottom:4px;color:var(--text2)}}
-.bot-embed-field strong{{color:var(--text)}}
-.warn-embed{{border-left-color:var(--yellow)}}
-.ban-embed{{border-left-color:var(--red)}}
-.casier-embed{{border-left-color:var(--purple)}}
-/* MOBILE */
-@media(max-width:768px){{
-.sidebar{{position:fixed;left:-220px;top:0;bottom:0;z-index:100;transition:left .25s}}
-.sidebar.open{{left:0}}
-.mobile-topbar{{display:flex!important}}
-html,body{{overflow:auto}}
-.app{{height:auto;min-height:100vh;flex-direction:column}}
-.main-content{{height:auto}}
-.content-area{{overflow:visible}}
-.disc-wrap{{height:auto}}
-.disc-messages{{max-height:60vh;overflow-y:auto}}
-.disc-input{{position:sticky;bottom:0}}
-.admin-grid{{grid-template-columns:repeat(2,1fr)}}
-.mo-box{{margin:16px}}
-}}
-.mobile-topbar{{display:none;height:48px;background:var(--bg2);border-bottom:1px solid var(--border);align-items:center;padding:0 14px;gap:12px;flex-shrink:0;position:sticky;top:0;z-index:90}}
-.hamburger{{width:32px;height:32px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2)}}
-.mobile-overlay{{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}}
-.mobile-overlay.show{{display:block}}
-.file-input{{display:none}}
-.av-upload-row{{display:flex;align-items:center;gap:14px;margin-bottom:14px}}
-.av-preview{{width:56px;height:56px;border-radius:50%;background:var(--bg4);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;overflow:hidden}}
-.av-preview img{{width:100%;height:100%;object-fit:cover}}
-/* NOTIFS PANEL */
-.notif-item{{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}}
-.notif-item.unread{{border-color:rgba(217,48,48,.3);background:rgba(217,48,48,.04)}}
-.notif-dot-ind{{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px}}
-/* VALIDATION REQUESTS */
-.val-card{{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:14px;margin-bottom:10px}}
-.admin-section-title{{font-weight:800;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px}}
-.admin-section-title::before{{content:'';width:3px;height:11px;background:var(--red);border-radius:2px}}
-</style>
-</head>
-<body>
-
-<!-- BAN SCREEN -->
-
-<!-- LOGIN GATE -->
-<div class="login-gate" id="loginGate">
-<div class="login-gate-box">
-<div class="login-logo">
-<img src="{LOGO}" alt="Radium" style="width:80px;height:80px;object-fit:contain">
-<div class="login-logo-text">RADIUM <span>ZONE-21</span></div>
-<div style="font-size:12px;color:var(--text3);margin-top:-6px">Forum Officiel</div>
-</div>
-<div class="auth-tabs">
-<div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Connexion</div>
-<div class="auth-tab" id="tab-register" onclick="switchTab('register')">S'inscrire</div>
-</div>
-<div id="form-login">
-<div class="il"><div class="il-label">Pseudo</div><input class="if" id="loginUser" placeholder="Votre pseudo..."></div>
-<div class="il"><div class="il-label">Mot de passe</div><input type="password" class="if" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-<button class="btn-red" style="width:100%;padding:12px;margin-top:4px" onclick="doLogin()">Se connecter</button>
-</div>
-<div id="form-register" style="display:none">
-<div class="il"><div class="il-label">Pseudo</div><input class="if" id="regPseudo" placeholder="Choisissez un pseudo..."></div>
-<div class="il"><div class="il-label">Adresse email</div><input type="email" class="if" id="regEmail" placeholder="exemple@gmail.com"></div>
-<div class="il"><div class="il-label">Mot de passe</div><input type="password" class="if" id="regPass" placeholder="Minimum 6 caractères..."></div>
-<div class="il"><div class="il-label">Confirmer</div><input type="password" class="if" id="regPass2" placeholder="Répétez..."></div>
-<button class="btn-red" style="width:100%;padding:12px;margin-top:4px" onclick="doRegister()">Créer mon compte</button>
-</div>
-</div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<!-- MODALS -->
-<div class="mo" id="mNewPost">
-<div class="mo-box">
-<div class="mo-title">Nouveau post <span class="mo-close" onclick="closeMo('mNewPost')">&#10005;</span></div>
-<div class="il" id="npTitleWrap"><div class="il-label">Titre</div><input class="if" id="npTitle" placeholder="Titre du post..."></div>
-<div class="il">
-<div class="il-label">Contenu</div>
-<div class="editor-wrap">
-<div class="editor-toolbar">
-<button class="tb-btn" onclick="ec('bold')"><strong>G</strong></button>
-<button class="tb-btn" onclick="ec('italic')"><em>I</em></button>
-<button class="tb-btn" onclick="ec('underline')" style="text-decoration:underline">S</button>
-<button class="tb-btn" onclick="ec('strikeThrough')" style="text-decoration:line-through">B</button>
-<div class="tb-sep"></div>
-<button class="tb-btn" onclick="ec('formatBlock','h1')" style="font-size:10px;font-weight:900">H1</button>
-<button class="tb-btn" onclick="ec('formatBlock','h2')" style="font-size:10px;font-weight:700">H2</button>
-</div>
-<div class="editor-body" id="npContent" contenteditable="true" data-placeholder="Rédigez votre post..." oninput="updateCC()"></div>
-<div class="editor-footer">
-<span style="font-size:11px;color:var(--text3)" id="ccCount">0 car.</span>
-<span style="font-size:11px;color:var(--text3)">@pseudo pour mentionner</span>
-</div>
-</div>
-</div>
-<div id="npTagArea" style="display:none;margin-bottom:14px">
-<div class="il-label" style="margin-bottom:6px">Tag</div>
-<div class="tag-sel-row">
-<div class="tsel" data-tag="En attente" onclick="pickTag(this)">En attente</div>
-<div class="tsel" data-tag="En traitement" onclick="pickTag(this)">En traitement</div>
-<div class="tsel" data-tag="Accepté" onclick="pickTag(this)">Accepté</div>
-<div class="tsel" data-tag="Refusé" onclick="pickTag(this)">Refusé</div>
-</div>
-</div>
-<button class="btn-red" style="width:100%;padding:12px" onclick="submitPost()">Publier</button>
-</div>
-</div>
-
-<div class="mo" id="mBan">
-<div class="mo-box">
-<div class="mo-title">Bannir du forum <span class="mo-close" onclick="closeMo('mBan')">&#10005;</span></div>
-<div class="il"><div class="il-label">Pseudo</div><input class="if" id="banTarget" placeholder="Pseudo..."></div>
-<div class="il"><div class="il-label">Raison</div><textarea class="if" id="banReason" placeholder="Raison..."></textarea></div>
-<button class="btn-red" style="width:100%;padding:12px" onclick="confirmBan()">Confirmer le bannissement</button>
-</div>
-</div>
-
-<div class="mo" id="mRole">
-<div class="mo-box">
-<div class="mo-title">Modifier le rôle <span class="mo-close" onclick="closeMo('mRole')">&#10005;</span></div>
-<div class="il"><div class="il-label">Pseudo</div><input class="if" id="roleTarget" placeholder="Pseudo..."></div>
-<div class="il"><div class="il-label">Rôle</div>
-<select class="if" id="roleSelect">
-<option value="fondateur">Fondateur</option>
-<option value="cofonda">Co-Fondateur</option>
-<option value="manager">Manager</option>
-<option value="admin">Admin</option>
-<option value="modo">Modérateur</option>
-<option value="devmap">Développeur Map</option>
-<option value="script">Scripteur</option>
-<option value="animateur">Animateur</option>
-<option value="acteur">Acteur SCP</option>
-<option value="resp">Resp. Département</option>
-<option value="vip">VIP</option>
-<option value="poto">Poto</option>
-<option value="membre" selected>Membre</option>
-<option value="banni">Banni</option>
-</select>
-</div>
-<button class="btn-red" style="width:100%;padding:12px" onclick="confirmRole()">Confirmer</button>
-</div>
-</div>
-
-<div class="mo" id="mEditProfile">
-<div class="mo-box">
-<div class="mo-title">Modifier mon profil <span class="mo-close" onclick="closeMo('mEditProfile')">&#10005;</span></div>
-<div class="av-upload-row">
-<div class="av-preview" id="editAvPrev"></div>
-<div>
-<div style="font-size:12px;color:var(--text2);margin-bottom:6px">Photo de profil</div>
-<label class="btn-outline btn-sm" for="fileAv" style="display:inline-block;cursor:pointer">Choisir une image</label>
-<input type="file" id="fileAv" class="file-input" accept="image/*" onchange="prevAv(this)">
-</div>
-</div>
-<div class="il"><div class="il-label">Pseudo</div><input class="if" id="editPseudo" placeholder="Votre pseudo..."></div>
-<div id="nameChangeNote" style="display:none;background:rgba(232,184,64,.1);border:1px solid rgba(232,184,64,.3);border-radius:7px;padding:10px;font-size:12px;color:var(--gold);margin-bottom:12px">⚠️ Le changement de pseudo doit être validé par un staff avant d'être effectif.</div>
-<div class="il"><div class="il-label">Bio</div><textarea class="if" id="editBio" placeholder="Parlez de vous..."></textarea></div>
-<button class="btn-red" style="width:100%;padding:12px" onclick="saveProf()">Enregistrer</button>
-</div>
-</div>
-
-<div class="mo" id="mReport">
-<div class="mo-box">
-<div class="mo-title">Signaler <span class="mo-close" onclick="closeMo('mReport')">&#10005;</span></div>
-<div class="il"><div class="il-label">Raison</div>
-<select class="if" id="repReason"><option>Comportement toxique</option><option>Spam</option><option>Insultes</option><option>Contenu inapproprié</option><option>Autre</option></select>
-</div>
-<div class="il"><div class="il-label">Détails (optionnel)</div><textarea class="if" id="repDetails" placeholder="Précisez..."></textarea></div>
-<button class="btn-red" style="width:100%;padding:12px" onclick="submitReport()">Envoyer</button>
-</div>
-</div>
-
-<div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
-
-<div class="app">
-<nav class="sidebar" id="sidebar">
-<div class="sidebar-logo" onclick="nav('home')">
-<img src="{LOGO}" alt="logo" style="width:32px;height:32px;object-fit:contain">
-<div class="sidebar-logo-text">RADIUM <span>ZONE-21</span></div>
-</div>
-<div class="sidebar-nav" id="sidebarNav"></div>
-<div class="sidebar-user" id="sidebarUser" onclick="nav('profile')"></div>
-</nav>
-<div class="main-content">
-<div class="mobile-topbar">
-<div class="hamburger" onclick="toggleSidebar()">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-</div>
-<span id="mobileTitle" style="font-weight:800;font-size:14px;flex:1">Forum</span>
-</div>
-<div class="topbar" id="topbar">
-<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-<div style="font-size:13px;color:var(--text3);cursor:pointer" onclick="nav('home')">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-</div>
-<span style="color:var(--text3);font-size:12px">›</span>
-<span class="topbar-title" id="topbarTitle">Forums</span>
-</div>
-<div style="display:flex;align-items:center;gap:8px">
-<div class="tb-icon-btn" id="notifBtn" onclick="nav('notifs')" title="Notifications">
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
-<div class="notif-badge" id="notifCount" style="display:none">0</div>
-</div>
-</div>
-</div>
-<div class="content-area" id="contentArea"></div>
-</div>
-</div>
-
+cat > /tmp/forum_js.js << 'JSEOF'
 <script>
-const LOGO_IMG = "{LOGO}";
+// =============================================
+// IMAGES (injectées par Python)
+// =============================================
+const LOGO_DATA = '__LOGO__';
+const BG_DATA   = '__BG__';
 
-// ===== DATA =====
-let CU = null;
+// Injecter le logo partout où c'est nécessaire
+document.getElementById('logoImg').src = LOGO_DATA;
+document.getElementById('sidebarLogoImg').src = LOGO_DATA;
 
-// Accounts stored locally (in real deployment: use a backend)
-let ACCOUNTS = {{
-  'rayan': {{pass:'Rayanlefonda_deradium_09374', role:'fondateur', msgs:0, posts:0, joined:'Jun 2026', bio:'Fondateur de Radium ZONE-21.', avatar:null, pseudo:'Rayan'}},
-}};
+// =============================================
+// DONNÉES & ÉTAT
+// =============================================
+let CU = null; // utilisateur connecté
 
-let posts = {{
-  'Règlement':[], 'Informations':[], 'Aide':[], 'Demande de Ban':[], 'Demande de Deban':[],
-  'Vos idées':[], 'Report Bug':[], 'Recrutement Modérateur':[], 'Recrutement Animateur':[],
-  'Recrutement Développeur Map':[], 'Recrutement Scripteurs':[], 'Recrutement Acteurs SCP':[], 'Suggestions VIP':[],
-}};
-let msgs = {{
-  'La Caverne':[], 'Annonces':[], 'Annonce RP':[], 'Actualités':[], 'Discussion Roleplay':[],
-  'Publicité':[], 'Annonce VIP':[], 'Spoils VIP':[], 'VIP Room':[],
-  'Annonce Staff':[], 'Discussion Staff':[], 'Réunion Staff':[], 'Report Messages':[],
-  'Validation Nom':[], 'Blacklist IG':[], 'Sanction Joueur':[],
-}};
+// Un seul vrai compte : Rayan (fondateur)
+// Les nouveaux inscrits sont ajoutés ici dynamiquement
+let ACCOUNTS = {
+  'rayan': {
+    pseudo: 'Rayan',
+    pass: 'Rayanlefonda_deradium_09374',
+    role: 'fondateur',
+    msgs: 0, posts: 0,
+    joined: 'Jun 2026',
+    bio: 'Fondateur de Radium ZONE-21.',
+    avatar: null
+  }
+};
+
+let posts = {
+  'Règlement':[],'Informations':[],'Aide':[],'Demande de Ban':[],'Demande de Deban':[],
+  'Vos idées':[],'Report Bug':[],'Recrutement Modérateur':[],'Recrutement Animateur':[],
+  'Recrutement Développeur Map':[],'Recrutement Scripteurs':[],'Recrutement Acteurs SCP':[],'Suggestions VIP':[]
+};
+let msgs = {
+  'La Caverne':[],'Annonces':[],'Annonce RP':[],'Actualités':[],'Discussion Roleplay':[],
+  'Publicité':[],'Annonce VIP':[],'Spoils VIP':[],'VIP Room':[],
+  'Annonce Staff':[],'Discussion Staff':[],'Réunion Staff':[],'Report Messages':[],
+  'Validation Nom':[],'Blacklist IG':[],'Sanction Joueur':[]
+};
 let banList = [];
 let logsList = [];
 let reportMsgs = [];
-let notifsList = []; // {{id, to, type, text, from, ch, msgIdx, read, time}}
-let nameChangeRequests = []; // {{id, user, oldName, newName, time, status}}
-let sanctions = {{}}; // {{pseudoRoblox: [{{type, by, reason, duration, time}}]}}
-let replyTarget = null; // {{msgIdx, author, preview}}
+let notifsList = [];           // {id, to, type, text, from, read, time, extra}
+let nameChangeRequests = [];   // {id, loginKey, oldPseudo, newPseudo, time, status}
+let sanctions = {};            // {pseudoRoblox: [{type,by,reason,duration,time}]}
+let replyTarget = null;        // {msgIdx, author, preview}
 let curCh=null, curType=null, curPerm=null, curTags=false, curIsReport=false, curIsSanction=false;
 let _selTag=null, tagPickIdx=null, repIdx=null;
 let reportCount = 0;
 
-const ROLES = {{
-  fondateur:{{label:'Fondateur',cls:'r-fonda',color:'#ff9999',avCls:'av-b-fonda',rank:13}},
-  cofonda:{{label:'Co-Fondateur',cls:'r-cofonda',color:'#ffaaaa',avCls:'av-b-cofonda',rank:12}},
-  manager:{{label:'Manager',cls:'r-manager',color:'#ffbbbb',avCls:'av-b-manager',rank:11}},
-  admin:{{label:'Admin',cls:'r-admin',color:'#88ccff',avCls:'av-b-admin',rank:10}},
-  modo:{{label:'Modérateur',cls:'r-modo',color:'#88ffaa',avCls:'av-b-modo',rank:9}},
-  devmap:{{label:'Dev. Map',cls:'r-devmap',color:'#ffaa66',avCls:'av-b-devmap',rank:8}},
-  script:{{label:'Scripteur',cls:'r-script',color:'#ffbb77',avCls:'av-b-script',rank:7}},
-  animateur:{{label:'Animateur',cls:'r-animateur',color:'#cc88ff',avCls:'av-b-animateur',rank:6}},
-  acteur:{{label:'Acteur SCP',cls:'r-acteur',color:'#dd99ff',avCls:'av-b-acteur',rank:5}},
-  resp:{{label:'Resp. Dép.',cls:'r-resp',color:'#aaaaff',avCls:'av-b-resp',rank:4}},
-  vip:{{label:'VIP',cls:'r-vip',color:'#f0c040',avCls:'av-b-vip',rank:3}},
-  poto:{{label:'Poto',cls:'r-poto',color:'#7ab0d8',avCls:'av-b-poto',rank:2}},
-  membre:{{label:'Membre',cls:'r-membre',color:'#9898b0',avCls:'av-b-membre',rank:1}},
-  banni:{{label:'Banni',cls:'r-banni',color:'#ff6666',avCls:'av-b-banni',rank:0}},
-}};
+// =============================================
+// CONSTANTES RÔLES
+// =============================================
+const ROLES = {
+  fondateur: {label:'Fondateur',  cls:'r-fonda',    color:'#ff9999', avCls:'av-b-fonda',    rank:13},
+  cofonda:   {label:'Co-Fondateur',cls:'r-cofonda',  color:'#ffaaaa', avCls:'av-b-cofonda',  rank:12},
+  manager:   {label:'Manager',    cls:'r-manager',  color:'#ffbbbb', avCls:'av-b-manager',  rank:11},
+  admin:     {label:'Admin',      cls:'r-admin',    color:'#88ccff', avCls:'av-b-admin',    rank:10},
+  modo:      {label:'Modérateur', cls:'r-modo',     color:'#88ffaa', avCls:'av-b-modo',     rank:9},
+  devmap:    {label:'Dev. Map',   cls:'r-devmap',   color:'#ffaa66', avCls:'av-b-devmap',   rank:8},
+  script:    {label:'Scripteur',  cls:'r-script',   color:'#ffbb77', avCls:'av-b-script',   rank:7},
+  animateur: {label:'Animateur',  cls:'r-animateur',color:'#cc88ff', avCls:'av-b-animateur',rank:6},
+  acteur:    {label:'Acteur SCP', cls:'r-acteur',   color:'#dd99ff', avCls:'av-b-acteur',   rank:5},
+  resp:      {label:'Resp. Dép.', cls:'r-resp',     color:'#aaaaff', avCls:'av-b-resp',     rank:4},
+  vip:       {label:'VIP',        cls:'r-vip',      color:'#f0c040', avCls:'av-b-vip',      rank:3},
+  poto:      {label:'Poto',       cls:'r-poto',     color:'#7ab0d8', avCls:'av-b-poto',     rank:2},
+  membre:    {label:'Membre',     cls:'r-membre',   color:'#9898b0', avCls:'av-b-membre',   rank:1},
+  banni:     {label:'Banni',      cls:'r-banni',    color:'#ff6666', avCls:'av-b-banni',    rank:0},
+};
 
-// ===== HELPERS =====
-function rl(r){{const d=ROLES[r];if(!d)return'';return`<span class="role ${{d.cls}}">${{d.label}}</span>`;}}
-function rc(r){{return(ROLES[r]||{{color:'#aaa'}}).color;}}
-function avEl(name,role,size){{
-  size=size||38;
-  const r=ROLES[role]||ROLES.membre;
-  const acc=Object.values(ACCOUNTS).find(a=>a.pseudo===name)||ACCOUNTS[name.toLowerCase()];
-  const av=acc&&acc.avatar?`<img src="${{acc.avatar}}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:(name[0]||'?').toUpperCase();
-  return`<div class="msg-av ${{r.avCls}}" style="width:${{size}}px;height:${{size}}px;font-size:${{Math.floor(size*.4)}}px;color:${{r.color}}">${{av}}</div>`;
-}}
-function tagCls(t){{return{{'En attente':'tw','En traitement':'tt','Accepté':'ta','Refusé':'tr'}}[t]||'tw';}}
-function canWrite(perm){{
-  if(!CU)return false;
-  const r=ROLES[CU.role]?.rank||0;
-  if(!perm)return true;
-  if(perm==='fondateur')return r>=13;
-  if(perm==='cofonda')return r>=12;
-  if(perm==='admin')return r>=10;
-  if(perm==='resp')return r>=4;
+// =============================================
+// HELPERS
+// =============================================
+function rl(r) {
+  const d = ROLES[r];
+  if (!d) return '';
+  return `<span class="role ${d.cls}">${d.label}</span>`;
+}
+function rc(r) { return (ROLES[r] || {color:'#aaa'}).color; }
+
+function avEl(pseudo, role, size) {
+  size = size || 38;
+  const rd = ROLES[role] || ROLES.membre;
+  // Trouver le compte par pseudo
+  const acc = Object.values(ACCOUNTS).find(a => a.pseudo === pseudo);
+  const inner = (acc && acc.avatar)
+    ? `<img src="${acc.avatar}" alt="">`
+    : (pseudo[0] || '?').toUpperCase();
+  return `<div class="av ${rd.avCls}" style="width:${size}px;height:${size}px;font-size:${Math.floor(size*.4)}px;color:${rd.color}">${inner}</div>`;
+}
+
+function tagCls(t) {
+  return {'En attente':'tw','En traitement':'tt','Accepté':'ta','Refusé':'tr'}[t] || 'tw';
+}
+
+function canWrite(perm) {
+  if (!CU) return false;
+  const r = ROLES[CU.role]?.rank || 0;
+  if (!perm) return true;
+  if (perm === 'fondateur') return r >= 13;
+  if (perm === 'cofonda')   return r >= 12;
+  if (perm === 'admin')     return r >= 10;
+  if (perm === 'resp')      return r >= 4;
   return true;
-}}
-function isStaff(){{return CU&&ROLES[CU.role]?.rank>=9;}}
-function canDel(targetRole){{
-  if(!CU)return false;
-  const ur=ROLES[CU.role]?.rank||0,tr=ROLES[targetRole]?.rank||0;
-  if(ur>=13)return true;
-  if(ur>=12)return tr<13;
-  if(ur>=11)return tr<12;
-  if(ur>=10)return tr<9;
-  if(ur>=9)return tr<9;
+}
+
+function isStaff() { return CU && (ROLES[CU.role]?.rank || 0) >= 9; }
+
+function canDel(targetRole) {
+  if (!CU) return false;
+  const ur = ROLES[CU.role]?.rank || 0;
+  const tr = ROLES[targetRole]?.rank || 0;
+  if (ur >= 13) return true;
+  if (ur >= 12) return tr < 13;
+  if (ur >= 11) return tr < 12;
+  if (ur >= 10) return tr < 9;
+  if (ur >= 9)  return tr < 9;
   return false;
-}}
-function toast(msg,ok){{
-  const t=document.getElementById('toast');
-  const icon=ok===false
-    ?`<svg viewBox="0 0 24 24" fill="none" stroke="#ff6666" stroke-width="2.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
-    :`<svg viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="2.5" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>`;
-  t.innerHTML=icon+msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
-}}
-function openMo(id){{document.getElementById(id).classList.add('show');}}
-function closeMo(id){{document.getElementById(id).classList.remove('show');}}
-function closeAllMenus(){{document.querySelectorAll('.msg-menu').forEach(e=>e.remove());}}
-document.addEventListener('click',e=>{{if(!e.target.closest('.msg-actions-btn')&&!e.target.closest('.msg-menu'))closeAllMenus();}});
-function fmtTime(){{const n=new Date();return`${{String(n.getDate()).padStart(2,'0')}}/${{String(n.getMonth()+1).padStart(2,'0')}} ${{String(n.getHours()).padStart(2,'0')}}:${{String(n.getMinutes()).padStart(2,'0')}}`;}}
-function escHtml(s){{return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}}
+}
 
-// ===== NOTIFICATIONS =====
-function addNotif(to, type, text, from, extra){{
-  notifsList.unshift({{id:Date.now()+Math.random(), to, type, text, from, extra:extra||{{}}, read:false, time:fmtTime()}});
+function toast(msg, ok) {
+  const t = document.getElementById('toast');
+  const color = ok === false ? '#ff6666' : '#27ae60';
+  const icon  = ok === false
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.5" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>`;
+  t.innerHTML = icon + msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function openMo(id)  { document.getElementById(id).classList.add('show'); }
+function closeMo(id) { document.getElementById(id).classList.remove('show'); }
+function closeAllMenus() { document.querySelectorAll('.msg-menu').forEach(e => e.remove()); }
+document.addEventListener('click', e => {
+  if (!e.target.closest('.msg-actions-btn') && !e.target.closest('.msg-menu')) closeAllMenus();
+});
+
+function fmtTime() {
+  const n = new Date();
+  return `${String(n.getDate()).padStart(2,'0')}/${String(n.getMonth()+1).padStart(2,'0')} ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+}
+
+// =============================================
+// NOTIFICATIONS
+// =============================================
+function addNotif(toPseudo, type, text, fromPseudo, extra) {
+  notifsList.unshift({
+    id: Date.now() + Math.random(),
+    to: toPseudo, type, text,
+    from: fromPseudo,
+    extra: extra || {},
+    read: false,
+    time: fmtTime()
+  });
   updateNotifBadge();
-}}
-function updateNotifBadge(){{
-  if(!CU)return;
-  const unread=notifsList.filter(n=>n.to===CU.pseudo&&!n.read).length;
-  const badge=document.getElementById('notifCount');
-  if(badge){{
-    if(unread>0){{badge.style.display='block';badge.textContent=unread>9?'9+':unread;}}
-    else badge.style.display='none';
-  }}
-}}
-function parsePings(text){{
-  // Replace @username with ping highlight and create notifs
-  return text.replace(/@([\\w_]+)/g,(match,pseudo)=>{{
-    const acc=Object.values(ACCOUNTS).find(a=>a.pseudo===pseudo||a.pseudo.toLowerCase()===pseudo.toLowerCase());
-    if(acc&&CU&&acc.pseudo!==CU.pseudo){{
-      addNotif(acc.pseudo,'ping',`${{CU.pseudo}} vous a mentionné dans #${{curCh}}`,CU.pseudo,{{ch:curCh}});
-    }}
-    return`<span class="ping-highlight">@${{pseudo}}</span>`;
-  }});
-}}
+}
 
-// ===== SIDEBAR =====
+function updateNotifBadge() {
+  if (!CU) return;
+  const unread = notifsList.filter(n => n.to === CU.pseudo && !n.read).length;
+  const badge = document.getElementById('notifCount');
+  if (!badge) return;
+  if (unread > 0) { badge.style.display = 'block'; badge.textContent = unread > 9 ? '9+' : unread; }
+  else badge.style.display = 'none';
+}
+
+// Traite les @mentions dans le contenu et crée des notifs
+function parsePings(html) {
+  return html.replace(/@([\w_]+)/g, (match, pseudo) => {
+    const acc = Object.values(ACCOUNTS).find(a =>
+      a.pseudo.toLowerCase() === pseudo.toLowerCase()
+    );
+    if (acc && CU && acc.pseudo !== CU.pseudo) {
+      addNotif(acc.pseudo, 'ping', `${CU.pseudo} vous a mentionné dans #${curCh}`, CU.pseudo, {ch: curCh});
+    }
+    return `<span class="ping-highlight">@${pseudo}</span>`;
+  });
+}
+
+// =============================================
+// SIDEBAR
+// =============================================
 const NAV_ITEMS = [
-  {{id:'home',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',label:'Forums',always:true}},
-  {{id:'profile',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>',label:'Mon profil',always:true}},
-  {{sep:'GÉNÉRAL',always:true}},
-  {{id:'ch:Règlement:post:fondateur',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',label:'Règlement',always:true}},
-  {{id:'ch:Informations:post:fondateur',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',label:'Informations',always:true}},
-  {{id:'ch:La Caverne:discussion',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',label:'La Caverne',always:true}},
-  {{id:'ch:Aide:post',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>',label:'Aide',always:true}},
-  {{sep:'RADIUM SCP',always:true}},
-  {{id:'ch:Annonces:discussion:fondateur',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>',label:'Annonces',always:true}},
-  {{id:'ch:Demande de Ban:post::tags',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',label:'Demande de Ban',always:true}},
-  {{id:'ch:Demande de Deban:post::tags',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>',label:'Demande de Deban',always:true}},
-  {{id:'ch:Vos idées:post',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',label:'Vos idées',always:true}},
-  {{id:'ch:Report Bug:post',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',label:'Report Bug',always:true}},
-  {{sep:'ROLEPLAY',always:true}},
-  {{id:'ch:Annonce RP:discussion:fondateur',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>',label:'Annonce RP',always:true}},
-  {{id:'ch:Actualités:discussion:resp',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>',label:'Actualités',always:true}},
-  {{id:'ch:Discussion Roleplay:discussion',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',label:'Discussion RP',always:true}},
-  {{id:'ch:Publicité:discussion:resp',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3l-4 4-4-4"/></svg>',label:'Publicité',always:true}},
-  {{sep:'RECRUTEMENT',always:true}},
-  {{id:'ch:Recrutement Modérateur:post-own',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',label:'Modo',always:true}},
-  {{id:'ch:Recrutement Animateur:post-own',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',label:'Animateur',always:true}},
-  {{id:'ch:Recrutement Développeur Map:post-own',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>',label:'Dev. Map',always:true}},
-  {{id:'ch:Recrutement Scripteurs:post-own',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',label:'Scripteurs',always:true}},
-  {{id:'ch:Recrutement Acteurs SCP:post-own',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',label:'Acteurs SCP',always:true}},
-  {{sep:'VIP',staffOrVip:true}},
-  {{id:'ch:Annonce VIP:discussion:fondateur',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>',label:'Annonce VIP',staffOrVip:true}},
-  {{id:'ch:Spoils VIP:discussion:fondateur',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>',label:'Spoils VIP',staffOrVip:true}},
-  {{id:'ch:VIP Room:discussion',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',label:'VIP Room',staffOrVip:true}},
-  {{id:'ch:Suggestions VIP:post',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2"/></svg>',label:'Suggestions VIP',staffOrVip:true}},
-  {{sep:'STAFF',staff:true}},
-  {{id:'ch:Annonce Staff:discussion:admin',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>',label:'Annonce Staff',staff:true}},
-  {{id:'ch:Discussion Staff:discussion',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',label:'Discussion Staff',staff:true}},
-  {{id:'ch:Réunion Staff:discussion',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',label:'Réunion Staff',staff:true}},
-  {{id:'ch:Validation Nom:discussion',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#f0c040" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9S3 16.97 3 12 7.03 3 12 3s9 4.03 9 9z"/></svg>',label:'Validation Nom',staff:true,badge:'nameReqCount'}},
-  {{id:'ch:Report Messages:discussion:::report',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#ff6666" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',label:'Report Messages',staff:true,badge:'reportCount'}},
-  {{id:'ch:Blacklist IG:discussion',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>',label:'Blacklist IG',staff:true}},
-  {{id:'ch:Sanction Joueur:discussion:::sanction',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',label:'Sanction Joueur',staff:true}},
-  {{id:'logs',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>',label:'Commandes Staff',staff:true}},
-  {{sep:'ADMIN',fonda:true}},
-  {{id:'admin',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#e8b840" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>',label:'Panneau Admin',fonda:true}},
+  {id:'home',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', label:'Forums', always:true},
+  {id:'profile',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>', label:'Mon profil', always:true},
+  {sep:'GÉNÉRAL', always:true},
+  {id:'ch:Règlement:post:fondateur',          icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>', label:'Règlement', always:true},
+  {id:'ch:Informations:post:fondateur',        icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>', label:'Informations', always:true},
+  {id:'ch:La Caverne:discussion',              icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>', label:'La Caverne', always:true},
+  {id:'ch:Aide:post',                          icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>', label:'Aide', always:true},
+  {sep:'RADIUM SCP', always:true},
+  {id:'ch:Annonces:discussion:fondateur',      icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>', label:'Annonces', always:true},
+  {id:'ch:Demande de Ban:post::tags',          icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>', label:'Demande de Ban', always:true},
+  {id:'ch:Demande de Deban:post::tags',        icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>', label:'Demande de Deban', always:true},
+  {id:'ch:Vos idées:post',                     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>', label:'Vos idées', always:true},
+  {id:'ch:Report Bug:post',                    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>', label:'Report Bug', always:true},
+  {sep:'ROLEPLAY', always:true},
+  {id:'ch:Annonce RP:discussion:fondateur',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>', label:'Annonce RP', always:true},
+  {id:'ch:Actualités:discussion:resp',         icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>', label:'Actualités', always:true},
+  {id:'ch:Discussion Roleplay:discussion',     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>', label:'Discussion RP', always:true},
+  {id:'ch:Publicité:discussion:resp',          icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3l-4 4-4-4"/></svg>', label:'Publicité', always:true},
+  {sep:'RECRUTEMENT', always:true},
+  {id:'ch:Recrutement Modérateur:post-own',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', label:'Modo', always:true},
+  {id:'ch:Recrutement Animateur:post-own',     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>', label:'Animateur', always:true},
+  {id:'ch:Recrutement Développeur Map:post-own',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>', label:'Dev. Map', always:true},
+  {id:'ch:Recrutement Scripteurs:post-own',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', label:'Scripteurs', always:true},
+  {id:'ch:Recrutement Acteurs SCP:post-own',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>', label:'Acteurs SCP', always:true},
+  {sep:'VIP', staffOrVip:true},
+  {id:'ch:Annonce VIP:discussion:fondateur',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>', label:'Annonce VIP', staffOrVip:true},
+  {id:'ch:Spoils VIP:discussion:fondateur',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/></svg>', label:'Spoils VIP', staffOrVip:true},
+  {id:'ch:VIP Room:discussion',                icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>', label:'VIP Room', staffOrVip:true},
+  {id:'ch:Suggestions VIP:post',               icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2"/></svg>', label:'Suggestions VIP', staffOrVip:true},
+  {sep:'STAFF', staff:true},
+  {id:'ch:Annonce Staff:discussion:admin',     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>', label:'Annonce Staff', staff:true},
+  {id:'ch:Discussion Staff:discussion',        icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>', label:'Discussion Staff', staff:true},
+  {id:'ch:Réunion Staff:discussion',           icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>', label:'Réunion Staff', staff:true},
+  {id:'ch:Validation Nom:valnom',              icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#f0c040" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>', label:'Validation Nom', staff:true, badge:'nameReqCount'},
+  {id:'ch:Report Messages:discussion:::report',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#ff6666" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>', label:'Report Messages', staff:true, badge:'reportCount'},
+  {id:'ch:Blacklist IG:discussion',            icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>', label:'Blacklist IG', staff:true},
+  {id:'ch:Sanction Joueur:discussion:::sanction', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>', label:'Sanction Joueur', staff:true},
+  {id:'logs', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>', label:'Commandes Staff', staff:true},
+  {sep:'ADMIN', fonda:true},
+  {id:'admin', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#e8b840" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>', label:'Panneau Admin', fonda:true},
 ];
 
-function buildSidebar(){{
-  const nav2=document.getElementById('sidebarNav');
-  nav2.innerHTML='';
-  const isVip2=CU&&(isStaff()||CU.role==='vip');
-  const staff2=CU&&isStaff();
-  const fonda2=CU&&ROLES[CU.role]?.rank>=12;
-  const nameReqCount=nameChangeRequests.filter(r=>r.status==='pending').length;
-  NAV_ITEMS.forEach(item=>{{
-    if(item.staff&&!staff2)return;
-    if(item.staffOrVip&&!staff2&&!isVip2)return;
-    if(item.fonda&&!fonda2)return;
-    if(item.sep){{nav2.innerHTML+=`<div class="sidebar-section">${{item.sep}}</div>`;return;}}
-    let badge='';
-    if(item.badge==='reportCount')badge=reportCount||0;
-    else if(item.badge==='nameReqCount')badge=nameReqCount||0;
-    else badge=item.badge||0;
-    nav2.innerHTML+=`<div class="sidebar-item" id="si-${{item.id.replace(/[: ]/g,'-')}}" onclick="handleNav('${{item.id}}')">${{item.icon||''}}<span style="flex:1">${{item.label}}</span>${{badge?`<span class="sidebar-badge">${{badge}}</span>`:''}}</div>`;
-  }});
-  const su=document.getElementById('sidebarUser');
-  if(!CU){{
-    su.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><div><div class="sidebar-user-name">Non connecté</div></div>`;
-  }} else {{
-    const r=ROLES[CU.role]||ROLES.membre;
-    const avContent=CU.avatar?`<img src="${{CU.avatar}}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:(CU.pseudo[0]||'?').toUpperCase();
-    su.innerHTML=`<div class="msg-av ${{r.avCls}}" style="width:32px;height:32px;font-size:13px;color:${{r.color}}">${{avContent}}</div><div style="flex:1;min-width:0"><div class="sidebar-user-name">${{CU.pseudo}}</div><div style="font-size:10px;margin-top:1px">${{rl(CU.role)}}</div></div>`;
-  }}
+function buildSidebar() {
+  const nav2 = document.getElementById('sidebarNav');
+  nav2.innerHTML = '';
+  const isVip2    = CU && (isStaff() || CU.role === 'vip');
+  const staff2    = CU && isStaff();
+  const fonda2    = CU && (ROLES[CU.role]?.rank || 0) >= 12;
+  const nameReqCount = nameChangeRequests.filter(r => r.status === 'pending').length;
+
+  NAV_ITEMS.forEach(item => {
+    if (item.staff    && !staff2)         return;
+    if (item.staffOrVip && !staff2 && !isVip2) return;
+    if (item.fonda    && !fonda2)         return;
+    if (item.sep) {
+      nav2.innerHTML += `<div class="sidebar-section">${item.sep}</div>`;
+      return;
+    }
+    let badge = 0;
+    if      (item.badge === 'reportCount')  badge = reportCount;
+    else if (item.badge === 'nameReqCount') badge = nameReqCount;
+    else if (item.badge)                    badge = item.badge;
+    nav2.innerHTML += `<div class="sidebar-item" id="si-${item.id.replace(/[: ]/g,'-')}" onclick="handleNav('${item.id}')">
+      ${item.icon || ''}
+      <span style="flex:1">${item.label}</span>
+      ${badge ? `<span class="sidebar-badge">${badge}</span>` : ''}
+    </div>`;
+  });
+
+  const su = document.getElementById('sidebarUser');
+  if (!CU) {
+    su.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <div><div class="sidebar-user-name">Non connecté</div></div>`;
+  } else {
+    const rd = ROLES[CU.role] || ROLES.membre;
+    const inner = CU.avatar
+      ? `<img src="${CU.avatar}" alt="">`
+      : (CU.pseudo[0] || '?').toUpperCase();
+    su.innerHTML = `<div class="av ${rd.avCls}" style="width:32px;height:32px;font-size:13px;color:${rd.color};flex-shrink:0">${inner}</div>
+      <div style="flex:1;min-width:0">
+        <div class="sidebar-user-name">${CU.pseudo}</div>
+        <div style="font-size:10px;margin-top:1px">${rl(CU.role)}</div>
+      </div>`;
+  }
   updateNotifBadge();
-}}
-function setSidebarActive(id){{
-  document.querySelectorAll('.sidebar-item').forEach(el=>el.classList.remove('active'));
-  const el=document.getElementById('si-'+id.replace(/[: ]/g,'-'));
-  if(el)el.classList.add('active');
-}}
-function handleNav(id){{
+}
+
+function setSidebarActive(id) {
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('si-' + id.replace(/[: ]/g, '-'));
+  if (el) el.classList.add('active');
+}
+
+function handleNav(id) {
   closeSidebar();
-  if(id.startsWith('ch:')){{
-    const parts=id.split(':');
-    const name=parts[1],type=parts[2],perm=parts[3]||null,tags=parts[4]==='tags',report=parts[5]==='report',sanction=parts[5]==='sanction';
-    openCh(name,type,perm,tags,report,sanction);
-  }} else nav(id);
-}}
+  if (id.startsWith('ch:')) {
+    const parts = id.split(':');
+    const name     = parts[1];
+    const type     = parts[2];
+    const perm     = parts[3] || null;
+    const tags     = parts[4] === 'tags';
+    const report   = parts[5] === 'report';
+    const sanction = parts[5] === 'sanction';
+    openCh(name, type, perm, tags, report, sanction);
+  } else {
+    nav(id);
+  }
+}
 
-// ===== NAVIGATION =====
-function nav(view){{
-  closeSidebar();setSidebarActive(view);
-  document.getElementById('topbarTitle').textContent=view==='home'?'Forums':view==='profile'?'Mon profil':view==='admin'?'Panneau Admin':view==='logs'?'Logs Staff':view==='notifs'?'Notifications':'';
-  document.getElementById('mobileTitle').textContent=document.getElementById('topbarTitle').textContent;
-  const ca=document.getElementById('contentArea');
-  if(view==='home')renderHome(ca);
-  else if(view==='profile')renderProfile(ca);
-  else if(view==='admin')renderAdmin(ca);
-  else if(view==='logs'){{ca.innerHTML='<div style="padding:24px"><div style="font-weight:800;font-size:16px;margin-bottom:16px">Logs Staff</div><div id="logsEl"></div></div>';renderLogs();}}
-  else if(view==='notifs')renderNotifs(ca);
-}}
-function toggleSidebar(){{document.getElementById('sidebar').classList.toggle('open');document.getElementById('mobileOverlay').classList.toggle('show');}}
-function closeSidebar(){{document.getElementById('sidebar').classList.remove('open');document.getElementById('mobileOverlay').classList.remove('show');}}
+// =============================================
+// NAVIGATION
+// =============================================
+function nav(view) {
+  closeSidebar();
+  setSidebarActive(view);
+  const titles = {home:'Forums', profile:'Mon profil', admin:'Panneau Admin', logs:'Logs Staff', notifs:'Notifications'};
+  const t = titles[view] || '';
+  document.getElementById('topbarTitle').textContent = t;
+  document.getElementById('mobileTitle').textContent = t;
+  const ca = document.getElementById('contentArea');
+  if      (view === 'home')    renderHome(ca);
+  else if (view === 'profile') renderProfile(ca);
+  else if (view === 'admin')   renderAdmin(ca);
+  else if (view === 'logs')    { ca.innerHTML = '<div style="padding:24px"><div style="font-weight:800;font-size:16px;margin-bottom:16px">Logs Staff</div><div id="logsEl"></div></div>'; renderLogs(); }
+  else if (view === 'notifs')  renderNotifs(ca);
+}
 
-// ===== AUTH =====
-function switchTab(tab){{
-  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  document.getElementById('form-login').style.display=tab==='login'?'block':'none';
-  document.getElementById('form-register').style.display=tab==='register'?'block':'none';
-}}
-function doLogin(){{
-  const u=document.getElementById('loginUser').value.trim().toLowerCase();
-  const p=document.getElementById('loginPass').value;
-  const acc=ACCOUNTS[u];
-  if(!acc){{toast('Pseudo introuvable',false);return;}}
-  if(acc.pass!==p){{toast('Mot de passe incorrect',false);return;}}
-  if(acc.role==='banni'){{
-    const ban=banList.find(b=>b.target===acc.pseudo);
-    document.getElementById('bMod').textContent=ban?ban.actor:'Staff';
-    document.getElementById('bReason').textContent=ban?ban.reason:'Non spécifiée';
-    document.getElementById('bDate').textContent=ban?ban.date:'—';
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+}
+
+// =============================================
+// AUTH
+// =============================================
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+function doLogin() {
+  const loginKey = document.getElementById('loginUser').value.trim().toLowerCase();
+  const pass     = document.getElementById('loginPass').value;
+  const acc      = ACCOUNTS[loginKey];
+  if (!acc)         { toast('Pseudo introuvable', false); return; }
+  if (acc.pass !== pass) { toast('Mot de passe incorrect', false); return; }
+  if (acc.role === 'banni') {
+    const ban = banList.find(b => b.targetKey === loginKey);
+    document.getElementById('bMod').textContent    = ban ? ban.actor  : 'Staff';
+    document.getElementById('bReason').textContent = ban ? ban.reason : 'Non précisée';
+    document.getElementById('bDate').textContent   = ban ? ban.date   : '—';
+    document.getElementById('loginGate').style.display = 'none';
     document.getElementById('banScreen').classList.add('show');
     return;
-  }}
-  CU={{loginKey:u,...acc}};
-  document.getElementById('loginGate').style.display='none';
-  buildSidebar();nav('home');
-}}
-function doRegister(){{
-  const pseudo=document.getElementById('regPseudo').value.trim();
-  const email=document.getElementById('regEmail').value.trim();
-  const pass=document.getElementById('regPass').value;
-  const pass2=document.getElementById('regPass2').value;
-  if(!pseudo||!email||!pass){{toast('Tous les champs requis',false);return;}}
-  if(pass!==pass2){{toast('Mots de passe différents',false);return;}}
-  if(pseudo.length<3){{toast('Pseudo trop court (min 3 car.)',false);return;}}
-  if(pass.length<6){{toast('Mot de passe trop court (min 6 car.)',false);return;}}
-  if(!email.includes('@')){{toast('Email invalide',false);return;}}
-  const key=pseudo.toLowerCase();
-  if(ACCOUNTS[key]){{toast('Pseudo déjà pris',false);return;}}
-  ACCOUNTS[key]={{pass,role:'membre',msgs:0,posts:0,joined:new Date().toLocaleDateString('fr-FR'),bio:'',avatar:null,pseudo}};
-  CU={{loginKey:key,...ACCOUNTS[key]}};
-  document.getElementById('loginGate').style.display='none';
-  buildSidebar();nav('home');
-  toast('Bienvenue ${{pseudo}} !');
-}}
-function logout(){{
-  CU=null;
-  document.getElementById('loginGate').style.display='flex';
-  document.getElementById('loginUser').value='';
-  document.getElementById('loginPass').value='';
+  }
+  CU = { loginKey, ...acc };
+  document.getElementById('loginGate').style.display = 'none';
   buildSidebar();
-}}
+  nav('home');
+}
 
-// ===== HOME =====
-function renderHome(ca){{
-  ca.innerHTML=`<div class="forum-home">
+function doRegister() {
+  const pseudo = document.getElementById('regPseudo').value.trim();
+  const email  = document.getElementById('regEmail').value.trim();
+  const pass   = document.getElementById('regPass').value;
+  const pass2  = document.getElementById('regPass2').value;
+  if (!pseudo || !email || !pass) { toast('Tous les champs sont requis', false); return; }
+  if (pseudo.length < 3)          { toast('Pseudo trop court (min 3 caractères)', false); return; }
+  if (pass.length < 6)            { toast('Mot de passe trop court (min 6 caractères)', false); return; }
+  if (pass !== pass2)             { toast('Les mots de passe ne correspondent pas', false); return; }
+  if (!email.includes('@'))       { toast('Email invalide', false); return; }
+  const loginKey = pseudo.toLowerCase();
+  if (ACCOUNTS[loginKey])         { toast('Ce pseudo est déjà pris', false); return; }
+  ACCOUNTS[loginKey] = {
+    pseudo, pass, role: 'membre',
+    msgs: 0, posts: 0,
+    joined: new Date().toLocaleDateString('fr-FR'),
+    bio: '', avatar: null
+  };
+  CU = { loginKey, ...ACCOUNTS[loginKey] };
+  document.getElementById('loginGate').style.display = 'none';
+  buildSidebar();
+  nav('home');
+  toast(`Bienvenue ${pseudo} !`);
+}
+
+function logout() {
+  CU = null;
+  buildSidebar();
+  document.getElementById('loginGate').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+// =============================================
+// HOME
+// =============================================
+function renderHome(ca) {
+  ca.innerHTML = `<div class="forum-home">
 <div class="forum-banner">
-<div class="forum-banner-overlay">
-<div>
-<div style="display:flex;align-items:center;gap:16px">
-<img src="${{LOGO_IMG}}" style="width:64px;height:64px;object-fit:contain" alt="Radium">
-<div class="banner-text">
-<h1>RADIUM <span>ZONE-21</span></h1>
-<p>Forum officiel du serveur SCP</p>
-<div class="banner-badge">${{rl(CU.role)}} Connecté en tant que ${{CU.pseudo}}</div>
-</div>
-</div>
-</div>
-</div>
+  <div class="forum-banner-overlay">
+    <div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <img src="${LOGO_DATA}" style="width:64px;height:64px;object-fit:contain" alt="Radium">
+        <div class="banner-text">
+          <h1>RADIUM <span>ZONE-21</span></h1>
+          <p>Forum officiel du serveur SCP</p>
+          <div class="banner-badge">${rl(CU.role)} Connecté en tant que ${CU.pseudo}</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="stats-row">
-<div class="stat-card"><div class="stat-n">${{Object.keys(ACCOUNTS).length}}</div><div class="stat-l">Membres</div></div>
-<div class="stat-card"><div class="stat-n" style="color:var(--green)">1</div><div class="stat-l">En ligne</div></div>
-<div class="stat-card"><div class="stat-n" style="color:var(--yellow)">${{Object.values(posts).reduce((a,b)=>a+b.length,0)}}</div><div class="stat-l">Posts</div></div>
-<div class="stat-card"><div class="stat-n" style="color:var(--red)">${{Object.values(ACCOUNTS).filter(a=>ROLES[a.role]?.rank>=9).length}}</div><div class="stat-l">Staff</div></div>
+  <div class="stat-card"><div class="stat-n">${Object.keys(ACCOUNTS).length}</div><div class="stat-l">Membres</div></div>
+  <div class="stat-card"><div class="stat-n" style="color:var(--green)">1</div><div class="stat-l">En ligne</div></div>
+  <div class="stat-card"><div class="stat-n" style="color:var(--yellow)">${Object.values(posts).reduce((a,b)=>a+b.length,0)}</div><div class="stat-l">Posts</div></div>
+  <div class="stat-card"><div class="stat-n" style="color:var(--red)">${Object.values(ACCOUNTS).filter(a=>(ROLES[a.role]?.rank||0)>=9).length}</div><div class="stat-l">Staff</div></div>
 </div>
-${{buildCatBlocks()}}
+${buildCatBlocks()}
 </div>`;
-}}
+}
 
-const CAT_DEFS=[
-  {{name:'Général',channels:[
-    {{ch:'Règlement',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',type:'post',perm:'fondateur'}},
-    {{ch:'Informations',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/></svg>',type:'post',perm:'fondateur'}},
-    {{ch:'La Caverne',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',type:'discussion'}},
-    {{ch:'Aide',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>',type:'post'}},
-  ]}},
-  {{name:'Radium SCP',channels:[
-    {{ch:'Annonces',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>',type:'discussion',perm:'fondateur'}},
-    {{ch:'Demande de Ban',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',type:'post',tags:true}},
-    {{ch:'Demande de Deban',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M9 12l2 2 4-4"/></svg>',type:'post',tags:true}},
-    {{ch:'Vos idées',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg>',type:'post'}},
-    {{ch:'Report Bug',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',type:'post'}},
-  ]}},
-  {{name:'Roleplay',channels:[
-    {{ch:'Annonce RP',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>',type:'discussion',perm:'fondateur'}},
-    {{ch:'Actualités',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>',type:'discussion',perm:'resp'}},
-    {{ch:'Discussion Roleplay',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',type:'discussion'}},
-    {{ch:'Publicité',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3l-4 4-4-4"/></svg>',type:'discussion',perm:'resp'}},
-  ]}},
-  {{name:'Recrutement',channels:[
-    {{ch:'Recrutement Modérateur',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',type:'post-own'}},
-    {{ch:'Recrutement Animateur',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',type:'post-own'}},
-    {{ch:'Recrutement Développeur Map',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>',type:'post-own'}},
-    {{ch:'Recrutement Scripteurs',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',type:'post-own'}},
-    {{ch:'Recrutement Acteurs SCP',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',type:'post-own'}},
-  ]}},
+// Définition des catégories
+const CAT_DEFS = [
+  {name:'Général', channels:[
+    {ch:'Règlement',          icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>', type:'post', perm:'fondateur'},
+    {ch:'Informations',       icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>', type:'post', perm:'fondateur'},
+    {ch:'La Caverne',         icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>', type:'discussion'},
+    {ch:'Aide',               icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 015.8 1c0 2-3 3-3 3M12 17h.01"/></svg>', type:'post'},
+  ]},
+  {name:'Radium SCP', channels:[
+    {ch:'Annonces',           icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>', type:'discussion', perm:'fondateur'},
+    {ch:'Demande de Ban',     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>', type:'post', tags:true},
+    {ch:'Demande de Deban',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M9 12l2 2 4-4"/></svg>', type:'post', tags:true},
+    {ch:'Vos idées',          icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>', type:'post'},
+    {ch:'Report Bug',         icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>', type:'post'},
+  ]},
+  {name:'Roleplay', channels:[
+    {ch:'Annonce RP',         icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>', type:'discussion', perm:'fondateur'},
+    {ch:'Actualités',         icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>', type:'discussion', perm:'resp'},
+    {ch:'Discussion Roleplay',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>', type:'discussion'},
+    {ch:'Publicité',          icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3l-4 4-4-4"/></svg>', type:'discussion', perm:'resp'},
+  ]},
+  {name:'Recrutement', channels:[
+    {ch:'Recrutement Modérateur',     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', type:'post-own'},
+    {ch:'Recrutement Animateur',      icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>', type:'post-own'},
+    {ch:'Recrutement Développeur Map',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/></svg>', type:'post-own'},
+    {ch:'Recrutement Scripteurs',     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', type:'post-own'},
+    {ch:'Recrutement Acteurs SCP',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>', type:'post-own'},
+  ]},
 ];
-const VIP_CAT={{name:'Salle des VIP',vip:true,channels:[
-  {{ch:'Annonce VIP',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>',type:'discussion',perm:'fondateur'}},
-  {{ch:'Spoils VIP',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/></svg>',type:'discussion',perm:'fondateur'}},
-  {{ch:'VIP Room',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',type:'discussion'}},
-  {{ch:'Suggestions VIP',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="3"/></svg>',type:'post'}},
-]}};
-const STAFF_CAT={{name:'Staff Radium SCP',staff:true,channels:[
-  {{ch:'Annonce Staff',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>',type:'discussion',perm:'admin'}},
-  {{ch:'Discussion Staff',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',type:'discussion'}},
-  {{ch:'Réunion Staff',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>',type:'discussion'}},
-  {{ch:'Validation Nom',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#f0c040" stroke-width="2" width="16" height="16"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>',type:'discussion'}},
-  {{ch:'Report Messages',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#ff6666" stroke-width="2" width="16" height="16"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>',type:'discussion',report:true}},
-  {{ch:'Blacklist IG',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>',type:'discussion'}},
-  {{ch:'Sanction Joueur',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',type:'discussion',sanction:true}},
-]}};
+const VIP_CAT = {name:'Salle des VIP', vip:true, channels:[
+  {ch:'Annonce VIP',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>', type:'discussion', perm:'fondateur'},
+  {ch:'Spoils VIP',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/></svg>', type:'discussion', perm:'fondateur'},
+  {ch:'VIP Room',      icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>', type:'discussion'},
+  {ch:'Suggestions VIP',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2"/></svg>', type:'post'},
+]};
+const STAFF_CAT = {name:'Staff Radium SCP', staff:true, channels:[
+  {ch:'Annonce Staff',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>', type:'discussion', perm:'admin'},
+  {ch:'Discussion Staff', icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>', type:'discussion'},
+  {ch:'Réunion Staff',    icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>', type:'discussion'},
+  {ch:'Validation Nom',   icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#f0c040" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>', type:'valnom'},
+  {ch:'Report Messages',  icon:'<svg viewBox="0 0 24 24" fill="none" stroke="#ff6666" stroke-width="2" width="16" height="16"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>', type:'discussion', report:true},
+  {ch:'Blacklist IG',     icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>', type:'discussion'},
+  {ch:'Sanction Joueur',  icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', type:'sanction'},
+]};
 
-function buildCatBlocks(){{
-  let html='';
-  const cats=[...CAT_DEFS];
-  const isVip2=CU&&(isStaff()||CU.role==='vip');
-  const staff2=CU&&isStaff();
-  if(isVip2)cats.push(VIP_CAT);
-  if(staff2)cats.push(STAFF_CAT);
-  cats.forEach(cat=>{{
-    const vs=cat.vip?'border-color:rgba(232,184,64,.25);':'';
-    const hs=cat.vip?'background:linear-gradient(90deg,rgba(232,184,64,.05),var(--bg2));':'';
-    const ns=cat.vip?'color:var(--gold);':'';
-    html+=`<div class="cat-block" style="${{vs}}"><div class="cat-head" style="${{hs}}"><div class="cat-head-name" style="${{ns}}">${{cat.name}}</div></div>`;
-    cat.channels.forEach(c=>{{
-      const last=((msgs[c.ch]||[]).slice(-1)[0]||{{author:'',content:''}});
-      const lastTxt=last.author?`${{last.author}} : "${{(last.content||'').replace(/<[^>]+>/g,'').slice(0,40)}}"`:
-        ((posts[c.ch]||[]).slice(-1)[0]||{{title:'Aucun post'}}).title||'Aucun message';
-      html+=`<div class="ch-row" onclick="openCh('${{c.ch}}','${{c.type}}','${{c.perm||''}}', ${{!!c.tags}},${{!!c.report}},${{!!c.sanction}})">
-<div class="ch-icon-wrap">${{c.icon}}</div>
-<div><div class="ch-name">${{c.ch}}</div><div class="ch-last">${{lastTxt}}</div></div>
+function buildCatBlocks() {
+  let html = '';
+  const cats = [...CAT_DEFS];
+  if (CU && (isStaff() || CU.role === 'vip')) cats.push(VIP_CAT);
+  if (CU && isStaff()) cats.push(STAFF_CAT);
+  cats.forEach(cat => {
+    const vs = cat.vip ? 'border-color:rgba(232,184,64,.25);' : '';
+    const hs = cat.vip ? 'background:linear-gradient(90deg,rgba(232,184,64,.05),var(--bg2));' : '';
+    const ns = cat.vip ? 'color:var(--gold);' : '';
+    html += `<div class="cat-block" style="${vs}"><div class="cat-head" style="${hs}"><div class="cat-head-name" style="${ns}">${cat.name}</div></div>`;
+    cat.channels.forEach(c => {
+      const isReport   = !!c.report;
+      const isSanction = c.type === 'sanction';
+      const isValnom   = c.type === 'valnom';
+      const lastArr = c.type === 'discussion' || c.type === 'sanction' || c.type === 'valnom' ? (msgs[c.ch] || []) : null;
+      const lastPost = !lastArr ? ((posts[c.ch] || []).slice(-1)[0]) : null;
+      let lastTxt = '';
+      if (lastArr && lastArr.length) {
+        const m = lastArr[lastArr.length - 1];
+        lastTxt = `${m.author} : "${(m.content || '').replace(/<[^>]+>/g,'').slice(0,40)}"`;
+      } else if (lastPost) {
+        lastTxt = lastPost.title || '';
+      } else {
+        lastTxt = 'Aucun message';
+      }
+      html += `<div class="ch-row" onclick="openCh('${c.ch}','${c.type}','${c.perm||''}',${!!c.tags},${isReport},${isSanction})">
+<div class="ch-icon-wrap">${c.icon}</div>
+<div style="min-width:0"><div class="ch-name">${c.ch}</div><div class="ch-last">${lastTxt}</div></div>
 <div></div>
 </div>`;
-    }});
-    html+='</div>';
-  }});
+    });
+    html += '</div>';
+  });
   return html;
-}}
+}
 
-// ===== CHANNELS =====
-function openCh(name,type,perm,hasTags,isReport,isSanction){{
-  curCh=name;curType=type;curPerm=perm||null;curTags=!!hasTags;curIsReport=!!isReport;curIsSanction=!!isSanction;
-  document.getElementById('topbarTitle').textContent=name;
-  document.getElementById('mobileTitle').textContent=name;
-  if(type==='discussion')renderDisc();
-  else renderPostList();
-}}
+// =============================================
+// CHANNELS — DISPATCH
+// =============================================
+function openCh(name, type, perm, hasTags, isReport, isSanction) {
+  curCh        = name;
+  curType      = type;
+  curPerm      = perm || null;
+  curTags      = !!hasTags;
+  curIsReport  = !!isReport;
+  curIsSanction= !!isSanction;
+  document.getElementById('topbarTitle').textContent = name;
+  document.getElementById('mobileTitle').textContent  = name;
+  setSidebarActive('ch:' + name + ':' + type + (perm ? ':' + perm : ''));
+  if (type === 'post' || type === 'post-own') renderPostList();
+  else if (type === 'valnom') renderValnom();
+  else if (type === 'sanction') renderSanction();
+  else renderDisc(); // discussion + report
+}
 
-// ===== POST LIST =====
-function renderPostList(){{
-  const ps=posts[curCh]||[];
-  const canCreate=(curType==='post'&&canWrite(curPerm))||(curType==='post-own'&&CU);
-  const ca=document.getElementById('contentArea');
-  ca.innerHTML=`<div class="post-list-wrap">
+// =============================================
+// POSTS
+// =============================================
+function renderPostList() {
+  const ps  = posts[curCh] || [];
+  const canCreate = (curType === 'post' && canWrite(curPerm)) || (curType === 'post-own' && !!CU);
+  const ca  = document.getElementById('contentArea');
+  ca.innerHTML = `<div class="post-list-wrap">
 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-<div style="font-weight:800;font-size:18px">${{curCh}}</div>
-${{canCreate?`<button class="btn-red btn-sm" onclick="openNP()">+ Nouveau post</button>`:''}}
+  <div style="font-weight:800;font-size:18px">${curCh}</div>
+  ${canCreate ? `<button class="btn-red btn-sm" onclick="openNP()">+ Nouveau post</button>` : ''}
 </div>
-${{!ps.length?`<div style="text-align:center;padding:40px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:10px">Aucun post.${{canCreate?' Soyez le premier !':''}}</div>`:''}}
-<div id="postListEl"></div></div>`;
-  const el=document.getElementById('postListEl');
-  ps.forEach((p,i)=>{{
-    const d=document.createElement('div');d.className='post-card';
-    d.innerHTML=`${{avEl(p.author,p.role,42)}}
-<div>
-<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;margin-bottom:4px">
-<span style="font-weight:700;color:${{rc(p.role)}}">${{p.author}}</span>${{rl(p.role)}}${{p.tag?`<span class="tag ${{tagCls(p.tag)}}">${{p.tag}}</span>`:''}}
-<span style="color:var(--text3);margin-left:auto">${{p.time}}</span>
-</div>
-<div style="font-weight:700;font-size:15px;margin-bottom:4px">${{p.title}}</div>
-<div style="font-size:12px;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${{p.content.replace(/<[^>]+>/g,' ')}}</div>
-</div>
-<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
-<span style="font-size:11px;color:var(--text3)">${{p.replies.length}} rép.</span>
-${{isStaff()?`<span style="font-size:11px;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:4px" onmouseenter="this.style.background='var(--bg5)'" onmouseleave="this.style.background=''" onclick="event.stopPropagation();openTagFor(${{i}})">Tag</span>`:''}}
-${{canDel(p.role)?`<span style="font-size:11px;color:#ff7777;cursor:pointer;padding:2px 6px;border-radius:4px" onclick="event.stopPropagation();delPost(${{i}})">Supprimer</span>`:''}}
+${!ps.length ? `<div style="text-align:center;padding:40px;color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:10px">Aucun post pour l'instant.${canCreate ? ' Soyez le premier !' : ''}</div>` : ''}
+<div id="postListEl"></div>
 </div>`;
-    d.onclick=()=>openPost(i);el.appendChild(d);
-  }});
-}}
+  const el = document.getElementById('postListEl');
+  ps.forEach((p, i) => {
+    const d = document.createElement('div');
+    d.className = 'post-card';
+    d.innerHTML = `
+${avEl(p.author, p.role, 42)}
+<div style="min-width:0">
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:12px;margin-bottom:4px">
+    <span style="font-weight:700;color:${rc(p.role)}">${p.author}</span>${rl(p.role)}
+    ${p.tag ? `<span class="tag ${tagCls(p.tag)}">${p.tag}</span>` : ''}
+    <span style="color:var(--text3);margin-left:auto">${p.time}</span>
+  </div>
+  <div style="font-weight:700;font-size:15px;margin-bottom:4px">${p.title}</div>
+  <div style="font-size:12px;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.content.replace(/<[^>]+>/g,' ')}</div>
+</div>
+<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+  <span style="font-size:11px;color:var(--text3)">${p.replies.length} rép.</span>
+  ${isStaff() ? `<span style="font-size:11px;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:4px" onclick="event.stopPropagation();openTagFor(${i})" onmouseenter="this.style.background='var(--bg5)'" onmouseleave="this.style.background=''">Tag</span>` : ''}
+  ${canDel(p.role) ? `<span style="font-size:11px;color:#ff7777;cursor:pointer;padding:2px 6px;border-radius:4px" onclick="event.stopPropagation();delPost(${i})" onmouseenter="this.style.background='rgba(217,48,48,.12)'" onmouseleave="this.style.background=''">Supprimer</span>` : ''}
+</div>`;
+    d.onclick = () => openPost(i);
+    el.appendChild(d);
+  });
+}
 
-function openPost(i){{
-  const p=posts[curCh][i];
-  const ca=document.getElementById('contentArea');
-  const canReply=curType!=='post-own'&&CU;
-  ca.innerHTML=`<div class="post-full-wrap">
+function openPost(i) {
+  const p   = posts[curCh][i];
+  const ca  = document.getElementById('contentArea');
+  const canReply = curType !== 'post-own' && !!CU;
+  ca.innerHTML = `<div class="post-full-wrap">
 <div style="margin-bottom:16px"><button class="btn-outline btn-sm" onclick="renderPostList()">← Retour</button></div>
-${{isStaff()?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
-<span class="tsel tw" onclick="setTag(${{i}},'En attente')">En attente</span>
-<span class="tsel tt" onclick="setTag(${{i}},'En traitement')">En traitement</span>
-<span class="tsel ta" onclick="setTag(${{i}},'Accepté')">Accepté</span>
-<span class="tsel tr" onclick="setTag(${{i}},'Refusé')">Refusé</span>
-</div>`:''}}
-${{p.tag?`<div style="margin-bottom:8px"><span class="tag ${{tagCls(p.tag)}}">${{p.tag}}</span></div>`:''}}
-<div class="pf-title">${{p.title}}</div>
+${isStaff() ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+  <span class="tsel tw" onclick="setTag(${i},'En attente')">En attente</span>
+  <span class="tsel tt" onclick="setTag(${i},'En traitement')">En traitement</span>
+  <span class="tsel ta" onclick="setTag(${i},'Accepté')">Accepté</span>
+  <span class="tsel tr" onclick="setTag(${i},'Refusé')">Refusé</span>
+</div>` : ''}
+${p.tag ? `<div style="margin-bottom:8px"><span class="tag ${tagCls(p.tag)}">${p.tag}</span></div>` : ''}
+<div class="pf-title">${p.title}</div>
 <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
-${{avEl(p.author,p.role,40)}}
-<div><div style="font-weight:700;color:${{rc(p.role)}}">${{p.author}}</div><div style="margin-top:3px">${{rl(p.role)}}</div></div>
-<span style="margin-left:auto;font-size:11px;color:var(--text3)">${{p.time}}</span>
+  ${avEl(p.author, p.role, 40)}
+  <div>
+    <div style="font-weight:700;color:${rc(p.role)}">${p.author}</div>
+    <div style="margin-top:3px">${rl(p.role)}</div>
+  </div>
+  <span style="margin-left:auto;font-size:11px;color:var(--text3)">${p.time}</span>
 </div>
-<div class="pf-body">${{p.content}}</div>
-<div style="font-weight:800;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:12px">${{p.replies.length}} Réponse${{p.replies.length!==1?'s':''}}</div>
-${{p.replies.map((r,ri)=>`<div class="reply-card">
-<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px">
-${{avEl(r.author,r.role,32)}}
-<span style="font-weight:700;color:${{rc(r.role)}}">${{r.author}}</span>${{rl(r.role)}}
-<span style="font-size:11px;color:var(--text3)">${{r.time||"à l'instant"}}</span>
-${{canDel(r.role)?`<span style="font-size:11px;color:#ff7777;cursor:pointer;margin-left:auto" onclick="delReply(${{i}},${{ri}})">Supprimer</span>`:''}}
-</div>
-<div style="font-size:13px;color:var(--text2);line-height:1.6">${{r.content}}</div>
-</div>`).join('')}}
-${{canReply?`<div style="margin-top:16px">
-<div class="editor-wrap">
-<div class="editor-toolbar">
-<button class="tb-btn" onclick="document.getElementById('replyEd').focus();document.execCommand('bold')"><strong>G</strong></button>
-<button class="tb-btn" onclick="document.getElementById('replyEd').focus();document.execCommand('italic')"><em>I</em></button>
-</div>
-<div class="editor-body" id="replyEd" contenteditable="true" data-placeholder="Votre réponse... (@pseudo pour mentionner)" style="min-height:70px"></div>
-<div class="editor-footer"><span></span><button class="btn-red btn-sm" onclick="submitReply(${{i}})">Répondre</button></div>
-</div></div>`:''}}
+<div class="pf-body">${p.content}</div>
+<div style="font-weight:800;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:12px">${p.replies.length} Réponse${p.replies.length !== 1 ? 's' : ''}</div>
+${p.replies.map((r, ri) => `<div class="reply-card">
+  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px">
+    ${avEl(r.author, r.role, 32)}
+    <span style="font-weight:700;color:${rc(r.role)}">${r.author}</span>${rl(r.role)}
+    <span style="font-size:11px;color:var(--text3)">${r.time || "à l'instant"}</span>
+    ${canDel(r.role) ? `<span style="font-size:11px;color:#ff7777;cursor:pointer;margin-left:auto" onclick="delReply(${i},${ri})">Supprimer</span>` : ''}
+  </div>
+  <div style="font-size:13px;color:var(--text2);line-height:1.6">${r.content}</div>
+</div>`).join('')}
+${canReply ? `<div style="margin-top:16px">
+  <div class="editor-wrap">
+    <div class="editor-toolbar">
+      <button class="tb-btn" onclick="document.getElementById('replyEd').focus();document.execCommand('bold')"><strong>G</strong></button>
+      <button class="tb-btn" onclick="document.getElementById('replyEd').focus();document.execCommand('italic')"><em>I</em></button>
+      <button class="tb-btn" onclick="document.getElementById('replyEd').focus();document.execCommand('underline')" style="text-decoration:underline">S</button>
+    </div>
+    <div class="editor-body" id="replyEd" contenteditable="true" data-placeholder="Votre réponse... (@pseudo pour mentionner)" style="min-height:70px"></div>
+    <div class="editor-footer"><span></span><button class="btn-red btn-sm" onclick="submitReply(${i})">Répondre</button></div>
+  </div>
+</div>` : ''}
 </div>`;
-}}
-function setTag(i,tag){{if(!isStaff())return;posts[curCh][i].tag=tag;addLog('TAG',CU.pseudo,CU.role,posts[curCh][i].author,tag);openPost(i);toast('Tag : '+tag);}}
-function delPost(i){{posts[curCh].splice(i,1);renderPostList();toast('Post supprimé');}}
-function delReply(pi,ri){{posts[curCh][pi].replies.splice(ri,1);openPost(pi);toast('Réponse supprimée');}}
-function submitReply(i){{
-  const ed=document.getElementById('replyEd');
-  if(!ed||!ed.innerHTML.trim()){{toast('Vide',false);return;}}
-  const content=parsePings(ed.innerHTML);
-  posts[curCh][i].replies.push({{author:CU.pseudo,role:CU.role,content,time:fmtTime()}});
-  // Notify original poster
-  const op=posts[curCh][i].author;
-  if(op!==CU.pseudo)addNotif(op,'reply',`${{CU.pseudo}} a répondu à votre post "${{posts[curCh][i].title.slice(0,30)}}"`,CU.pseudo,{{ch:curCh,postIdx:i}});
-  openPost(i);toast('Réponse publiée !');
-}}
-function openNP(tagOnly){{
-  tagPickIdx=tagOnly?tagPickIdx:null;_selTag=null;
-  document.getElementById('npTitleWrap').style.display=tagOnly?'none':'block';
-  document.getElementById('npTagArea').style.display=(curTags||tagOnly)?'block':'none';
-  document.getElementById('npTitle').value='';document.getElementById('npContent').innerHTML='';
-  document.querySelectorAll('.tsel').forEach(e=>e.classList.remove('sel'));
+}
+
+function setTag(i, tag) {
+  if (!isStaff()) return;
+  posts[curCh][i].tag = tag;
+  addLog('TAG', CU.pseudo, CU.role, posts[curCh][i].author, tag);
+  openPost(i);
+  toast('Tag : ' + tag);
+}
+function delPost(i)        { posts[curCh].splice(i, 1); renderPostList(); toast('Post supprimé'); }
+function delReply(pi, ri)  { posts[curCh][pi].replies.splice(ri, 1); openPost(pi); toast('Réponse supprimée'); }
+
+function submitReply(i) {
+  const ed = document.getElementById('replyEd');
+  if (!ed || !ed.innerHTML.trim()) { toast('Réponse vide', false); return; }
+  const content = parsePings(ed.innerHTML);
+  posts[curCh][i].replies.push({ author: CU.pseudo, role: CU.role, content, time: fmtTime() });
+  const op = posts[curCh][i].author;
+  if (op !== CU.pseudo) addNotif(op, 'reply', `${CU.pseudo} a répondu à votre post "${posts[curCh][i].title.slice(0,30)}"`, CU.pseudo, {ch: curCh});
+  openPost(i);
+  toast('Réponse publiée !');
+}
+
+function openNP(tagOnly) {
+  tagPickIdx = tagOnly ? tagPickIdx : null;
+  _selTag = null;
+  document.getElementById('npTitleWrap').style.display  = tagOnly ? 'none' : 'block';
+  document.getElementById('npTagArea').style.display    = (curTags || tagOnly) ? 'block' : 'none';
+  document.getElementById('npTitle').value              = '';
+  document.getElementById('npContent').innerHTML        = '';
+  document.getElementById('ccCount').textContent        = '0 car.';
+  document.querySelectorAll('.tsel').forEach(e => e.classList.remove('sel'));
   openMo('mNewPost');
-}}
-function openTagFor(i){{tagPickIdx=i;openNP(true);}}
-function pickTag(el){{document.querySelectorAll('.tsel').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');_selTag=el.dataset.tag;}}
-function submitPost(){{
-  if(tagPickIdx!==null){{
-    if(_selTag&&posts[curCh][tagPickIdx])posts[curCh][tagPickIdx].tag=_selTag;
-    closeMo('mNewPost');renderPostList();toast('Tag appliqué');return;
-  }}
-  const title=document.getElementById('npTitle').value.trim();
-  const content=parsePings(document.getElementById('npContent').innerHTML.trim());
-  if(!title){{toast('Titre requis',false);return;}}
-  if(!posts[curCh])posts[curCh]=[];
-  posts[curCh].unshift({{id:Date.now(),author:CU.pseudo,role:CU.role,title,content:content||'(Vide)',time:fmtTime(),replies:[],tag:_selTag||null}});
-  closeMo('mNewPost');renderPostList();toast('Post publié !');
-}}
-function updateCC(){{const el=document.getElementById('npContent');const cc=document.getElementById('ccCount');if(el&&cc)cc.textContent=(el.innerText||'').length+' car.';}}
-function ec(cmd,val){{const ed=document.getElementById('npContent');if(ed){{ed.focus();document.execCommand(cmd,false,val||null);}}updateCC();}}
+}
+function openTagFor(i) { tagPickIdx = i; openNP(true); }
+function pickTag(el) {
+  document.querySelectorAll('.tsel').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel');
+  _selTag = el.dataset.tag;
+}
+function submitPost() {
+  if (tagPickIdx !== null) {
+    if (_selTag && posts[curCh][tagPickIdx]) {
+      posts[curCh][tagPickIdx].tag = _selTag;
+      addLog('TAG', CU.pseudo, CU.role, posts[curCh][tagPickIdx].author, _selTag);
+    }
+    closeMo('mNewPost'); renderPostList(); toast('Tag appliqué'); return;
+  }
+  const title   = document.getElementById('npTitle').value.trim();
+  const content = parsePings(document.getElementById('npContent').innerHTML.trim());
+  if (!title) { toast('Titre requis', false); return; }
+  if (!posts[curCh]) posts[curCh] = [];
+  posts[curCh].unshift({ id: Date.now(), author: CU.pseudo, role: CU.role, title, content: content || '(Vide)', time: fmtTime(), replies: [], tag: _selTag || null });
+  if (CU.posts != null) CU.posts++;
+  closeMo('mNewPost'); renderPostList(); toast('Post publié !');
+}
+function updateCC() {
+  const el = document.getElementById('npContent');
+  const cc = document.getElementById('ccCount');
+  if (el && cc) cc.textContent = (el.innerText || '').length + ' car.';
+}
+function ec(cmd, val) {
+  const ed = document.getElementById('npContent');
+  if (ed) { ed.focus(); document.execCommand(cmd, false, val || null); }
+  updateCC();
+}
 
-// ===== DISCUSSION =====
-function renderDisc(){{
-  const ca=document.getElementById('contentArea');ca.innerHTML='';
-  const wrap=document.createElement('div');wrap.className='disc-wrap';
-  const msgArea=document.createElement('div');msgArea.className='disc-messages';msgArea.id='discMsgs';
+// =============================================
+// DISCUSSION
+// =============================================
+function renderDisc() {
+  const ca = document.getElementById('contentArea');
+  ca.innerHTML = '';
+  const wrap    = document.createElement('div'); wrap.className = 'disc-wrap';
+  const msgArea = document.createElement('div'); msgArea.className = 'disc-messages'; msgArea.id = 'discMsgs';
   wrap.appendChild(msgArea);
-  if(!curIsReport&&!curIsSanction&&canWrite(curPerm)){{
-    const inputArea=document.createElement('div');inputArea.className='disc-input';
-    inputArea.innerHTML=`
+
+  if (!curIsReport && canWrite(curPerm)) {
+    const inp = document.createElement('div'); inp.className = 'disc-input';
+    inp.innerHTML = `
 <div id="replyIndicator" style="display:none" class="reply-indicator">
-<span id="replyText">Répondre à...</span>
-<span style="cursor:pointer;color:var(--text3)" onclick="cancelReply()">✕</span>
+  <span id="replyText" style="flex:1"></span>
+  <span style="cursor:pointer;padding:0 4px" onclick="cancelReply()">✕</span>
 </div>
 <div class="editor-wrap">
-<div class="editor-toolbar">
-<button class="tb-btn" onclick="emcd('bold')"><strong>G</strong></button>
-<button class="tb-btn" onclick="emcd('italic')"><em>I</em></button>
-<button class="tb-btn" onclick="emcd('underline')" style="text-decoration:underline">S</button>
-<button class="tb-btn" onclick="emcd('strikeThrough')" style="text-decoration:line-through">B</button>
-<div class="tb-sep"></div>
-<button class="tb-btn" onclick="emcd('formatBlock','h1')" style="font-size:10px;font-weight:900">H1</button>
-<button class="tb-btn" onclick="emcd('formatBlock','h2')" style="font-size:10px;font-weight:700">H2</button>
-<div class="tb-sep"></div>
-<button class="tb-btn" onclick="emcd('undo')">↩</button>
-<button class="tb-btn" onclick="emcd('redo')">↪</button>
-</div>
-<div class="editor-body" id="msgEd" contenteditable="true" data-placeholder="Écrivez votre message... (@pseudo pour mentionner)"></div>
-<div class="editor-footer">
-<span style="font-size:11px;color:var(--text3)">@pseudo pour mentionner · Ctrl+Entrée pour envoyer</span>
-<button class="btn-red btn-sm" onclick="sendMsg()">Envoyer</button>
-</div>
+  <div class="editor-toolbar">
+    <button class="tb-btn" onclick="emcd('bold')"><strong>G</strong></button>
+    <button class="tb-btn" onclick="emcd('italic')"><em>I</em></button>
+    <button class="tb-btn" onclick="emcd('underline')" style="text-decoration:underline">S</button>
+    <button class="tb-btn" onclick="emcd('strikeThrough')" style="text-decoration:line-through">B</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="emcd('formatBlock','h1')" style="font-size:10px;font-weight:900">H1</button>
+    <button class="tb-btn" onclick="emcd('formatBlock','h2')" style="font-size:10px;font-weight:700">H2</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="emcd('undo')">↩</button>
+    <button class="tb-btn" onclick="emcd('redo')">↪</button>
+  </div>
+  <div class="editor-body" id="msgEd" contenteditable="true" data-placeholder="Écrivez votre message... (@pseudo pour mentionner, Ctrl+Entrée pour envoyer)"></div>
+  <div class="editor-footer">
+    <span style="font-size:11px;color:var(--text3)">@pseudo pour mentionner</span>
+    <button class="btn-red btn-sm" onclick="sendMsg()">Envoyer</button>
+  </div>
 </div>`;
-    wrap.appendChild(inputArea);
-  }}
-  if(curIsSanction&&isStaff()){{
-    const cmdArea=document.createElement('div');cmdArea.className='disc-input';
-    cmdArea.innerHTML=`
-<div style="font-size:12px;color:var(--text3);margin-bottom:6px">Commandes : <code style="background:var(--bg4);padding:1px 5px;border-radius:3px">!warn</code> <code style="background:var(--bg4);padding:1px 5px;border-radius:3px">!ban</code> <code style="background:var(--bg4);padding:1px 5px;border-radius:3px">!casiers</code> <code style="background:var(--bg4);padding:1px 5px;border-radius:3px">!modifcasiers</code></div>
-<div class="editor-wrap">
-<div class="editor-body" id="cmdEd" contenteditable="true" data-placeholder="Tapez une commande... ex: !warn PseudoRoblox" style="min-height:40px;max-height:60px;font-family:monospace"></div>
-<div class="editor-footer"><span></span><button class="btn-red btn-sm" onclick="handleBotCmd()">Envoyer</button></div>
-</div>`;
-    wrap.appendChild(cmdArea);
-  }}
-  ca.appendChild(wrap);renderMsgs();
-}}
-function emcd(cmd,val){{const ed=document.getElementById('msgEd');if(ed){{ed.focus();document.execCommand(cmd,false,val||null);}}}}
+    wrap.appendChild(inp);
+  }
+  ca.appendChild(wrap);
+  renderMsgs();
+}
 
-function cancelReply(){{
-  replyTarget=null;
-  const ri=document.getElementById('replyIndicator');
-  if(ri)ri.style.display='none';
-}}
-function setReply(i){{
-  const m=msgs[curCh][i];
-  if(!m)return;
-  replyTarget={{msgIdx:i,author:m.author,preview:(m.content||'').replace(/<[^>]+>/g,'').slice(0,50)}};
-  const ri=document.getElementById('replyIndicator');
-  const rt=document.getElementById('replyText');
-  if(ri&&rt){{ri.style.display='flex';rt.textContent=`Répondre à ${{m.author}} : "${{replyTarget.preview}}"`;}}
+function emcd(cmd, val) {
+  const ed = document.getElementById('msgEd');
+  if (ed) { ed.focus(); document.execCommand(cmd, false, val || null); }
+}
+
+function cancelReply() {
+  replyTarget = null;
+  const ri = document.getElementById('replyIndicator');
+  if (ri) ri.style.display = 'none';
+}
+
+function setReply(i) {
+  const m = (msgs[curCh] || [])[i];
+  if (!m) return;
+  replyTarget = { msgIdx: i, author: m.author, preview: (m.content || '').replace(/<[^>]+>/g,'').slice(0,50) };
+  const ri = document.getElementById('replyIndicator');
+  const rt = document.getElementById('replyText');
+  if (ri && rt) { ri.style.display = 'flex'; rt.textContent = `Répondre à ${m.author} : "${replyTarget.preview}"`; }
   document.getElementById('msgEd')?.focus();
-}}
+}
 
-function renderMsgs(){{
-  const area=document.getElementById('discMsgs');if(!area)return;area.innerHTML='';
-  // Report channel
-  if(curIsReport){{
-    if(!reportMsgs.length){{area.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Aucun signalement.</div>';return;}}
-    reportMsgs.forEach(r=>{{
-      area.innerHTML+=`<div class="bot-msg"><div class="bot-av">🤖</div><div>
+function renderMsgs() {
+  const area = document.getElementById('discMsgs'); if (!area) return;
+  area.innerHTML = '';
+  if (curIsReport) {
+    if (!reportMsgs.length) { area.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Aucun signalement.</div>'; return; }
+    reportMsgs.forEach(r => {
+      area.innerHTML += `<div class="bot-msg"><div class="bot-av">🤖</div><div>
 <div style="font-weight:800;font-size:12px;color:#88ccff;margin-bottom:4px">RadiumBot</div>
 <div style="font-size:12px;color:var(--text2);line-height:1.6">
-<strong>${{r.reporter}}</strong> a signalé <strong style="color:var(--red)">${{r.target}}</strong><br>
-Raison : ${{r.reason}} | Salon : ${{r.channel}}<br>
-<span style="color:var(--text3)">${{r.time}}</span>
+<strong>${r.reporter}</strong> a signalé <strong style="color:var(--red)">${r.target}</strong><br>
+Raison : ${r.reason} | Salon : ${r.channel}<br>
+<span style="color:var(--text3)">${r.time}</span>
 </div></div></div>`;
-    }});
+    });
     return;
-  }}
-  // Validation Nom channel
-  if(curCh==='Validation Nom'){{
-    renderValidationNom(area);return;
-  }}
-  const ms=msgs[curCh]||[];
-  if(!ms.length){{area.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Aucun message. Soyez le premier !</div>';return;}}
-  ms.forEach((m,i)=>{{
-    const canDelMsg=canDel(m.role);
-    const canReport=CU&&!isStaff()&&m.author!==CU.pseudo;
-    const showMenu=canDelMsg||canReport||true;
-    const div=document.createElement('div');div.className='msg-item';div.dataset.idx=i;
-    let replyHtml='';
-    if(m.replyTo!=null&&ms[m.replyTo]){{
-      const ref=ms[m.replyTo];
-      replyHtml=`<div class="msg-reply-ref" onclick="scrollToMsg(${{m.replyTo}})"><div class="ref-author">${{ref.author}}</div>${{(ref.content||'').replace(/<[^>]+>/g,'').slice(0,60)}}</div>`;
-    }}
-    const processedContent=m.content||'';
-    div.innerHTML=`
-${{avEl(m.author,m.role,38)}}
+  }
+  const ms = msgs[curCh] || [];
+  if (!ms.length) { area.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Aucun message. Soyez le premier !</div>'; return; }
+  ms.forEach((m, i) => {
+    if (m.isBotEmbed && m.embed) { renderBotEmbed(area, m); return; }
+    const canDelMsg = canDel(m.role);
+    const canReport = !!CU && !isStaff() && m.author !== CU.pseudo;
+    const div = document.createElement('div'); div.className = 'msg-item'; div.dataset.idx = i;
+    let replyHtml = '';
+    if (m.replyTo != null && ms[m.replyTo]) {
+      const ref = ms[m.replyTo];
+      replyHtml = `<div class="msg-reply-ref" onclick="scrollToMsg(${m.replyTo})">
+<span style="color:var(--red);font-weight:700">↩</span>
+<div><div style="font-weight:700;color:var(--text2)">${ref.author}</div><div>${(ref.content||'').replace(/<[^>]+>/g,'').slice(0,60)}</div></div>
+</div>`;
+    }
+    div.innerHTML = `
+${avEl(m.author, m.role, 38)}
 <div class="msg-body">
-<div class="msg-head"><span class="msg-author" style="color:${{rc(m.role)}}">${{m.author}}</span>${{rl(m.role)}}<span class="msg-time">${{m.time}}</span></div>
-${{replyHtml}}
-<div class="msg-text">${{processedContent}}</div>
+  <div class="msg-head">
+    <span class="msg-author" style="color:${rc(m.role)}">${m.author}</span>${rl(m.role)}
+    <span class="msg-time">${m.time}</span>
+  </div>
+  ${replyHtml}
+  <div class="msg-text">${m.content}</div>
 </div>
-<div class="msg-actions-btn" onclick="showMsgMenu(event,${{i}},${{canDelMsg}},${{canReport}})">⋯</div>`;
+<div class="msg-actions-btn" onclick="showMsgMenu(event,${i},${canDelMsg},${canReport})">⋯</div>`;
     area.appendChild(div);
-  }});
-  area.scrollTop=area.scrollHeight;
-}}
+  });
+  area.scrollTop = area.scrollHeight;
+}
 
-function scrollToMsg(idx){{
-  const area=document.getElementById('discMsgs');
-  const el=area?.querySelector(`[data-idx="${{idx}}"]`);
-  if(el){{el.style.background='rgba(217,48,48,.1)';el.scrollIntoView({{behavior:'smooth',block:'center'}});setTimeout(()=>el.style.background='',1500);}}
-}}
-
-function showMsgMenu(e,i,cd,cr){{
-  e.stopPropagation();closeAllMenus();
-  const m=msgs[curCh][i];
-  const menu=document.createElement('div');menu.className='msg-menu';
-  // Reply
-  const rep=document.createElement('div');rep.className='mm-item';
-  rep.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg>Répondre`;
-  rep.onclick=()=>{{setReply(i);closeAllMenus();}};menu.appendChild(rep);
-  if(cd){{
-    const d=document.createElement('div');d.className='mm-item danger';
-    d.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>Supprimer`;
-    d.onclick=()=>{{delMsg(i);closeAllMenus();}};menu.appendChild(d);
-    if(ROLES[CU.role]?.rank>=10){{
-      const b=document.createElement('div');b.className='mm-item danger';
-      b.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bannir ${{m.author}}`;
-      b.onclick=()=>{{quickBan(m.author);closeAllMenus();}};menu.appendChild(b);
-    }}
-  }}
-  if(cr){{
-    const r2=document.createElement('div');r2.className='mm-item';
-    r2.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>Signaler`;
-    r2.onclick=()=>{{repIdx=i;openMo('mReport');closeAllMenus();}};menu.appendChild(r2);
-  }}
-  const btn=e.currentTarget;
-  const ex=btn.parentElement.querySelector('.msg-menu');if(ex)ex.remove();
-  btn.parentElement.appendChild(menu);
-}}
-
-function submitReport(){{
-  const reason=document.getElementById('repReason').value;
-  const details=document.getElementById('repDetails').value;
-  const m=msgs[curCh]?.[repIdx];
-  const target=m?m.author:'inconnu';
-  reportMsgs.unshift({{reporter:CU.pseudo,target,reason:reason+(details?' — '+details:''),channel:curCh,time:fmtTime()}});
-  reportCount++;
-  closeMo('mReport');buildSidebar();toast('Signalement envoyé au staff');
-}}
-
-function delMsg(i){{msgs[curCh].splice(i,1);renderMsgs();toast('Message supprimé');}}
-
-function sendMsg(){{
-  const ed=document.getElementById('msgEd');
-  if(!ed||!ed.innerHTML.trim())return;
-  if(!CU){{toast('Connectez-vous',false);return;}}
-  if(!msgs[curCh])msgs[curCh]=[];
-  const content=parsePings(ed.innerHTML);
-  const msgObj={{id:Date.now(),author:CU.pseudo,role:CU.role,content,time:fmtTime(),replyTo:replyTarget?replyTarget.msgIdx:null}};
-  msgs[curCh].push(msgObj);
-  // Notify if reply
-  if(replyTarget){{
-    const origMsg=msgs[curCh][replyTarget.msgIdx];
-    if(origMsg&&origMsg.author!==CU.pseudo){{
-      addNotif(origMsg.author,'reply',`${{CU.pseudo}} a répondu à votre message dans #${{curCh}}`,CU.pseudo,{{ch:curCh}});
-    }}
-  }}
-  ed.innerHTML='';cancelReply();renderMsgs();
-}}
-document.addEventListener('keydown',e=>{{if(e.ctrlKey&&e.key==='Enter'){{const ed=document.getElementById('msgEd');if(document.activeElement===ed)sendMsg();}}}});
-
-// ===== BOT COMMANDS =====
-function handleBotCmd(){{
-  const ed=document.getElementById('cmdEd');
-  if(!ed||!ed.innerText.trim())return;
-  const raw=ed.innerText.trim();
-  ed.innerHTML='';
-  if(!msgs['Sanction Joueur'])msgs['Sanction Joueur']=[];
-  const ms=msgs['Sanction Joueur'];
-
-  if(raw.startsWith('!warn ')){{
-    const pseudo=raw.slice(6).trim();
-    if(!pseudo){{toast('Usage: !warn <pseudo>',false);return;}}
-    const reason=prompt(`Raison du warn pour ${{pseudo}} ?`);
-    if(!reason)return;
-    if(!sanctions[pseudo])sanctions[pseudo]=[];
-    const s={{type:'WARN',by:CU.pseudo,reason,duration:'—',time:fmtTime()}};
-    sanctions[pseudo].push(s);
-    addLog('WARN',CU.pseudo,CU.role,pseudo,reason);
-    ms.push({{id:Date.now(),author:'RadiumBot',role:'admin',isBotEmbed:true,
-      embed:{{type:'warn',title:`⚠️ WARN — ${{pseudo}}`,fields:[
-        {{k:'Joueur',v:pseudo}},{{k:'Staff',v:CU.pseudo}},{{k:'Raison',v:reason}},{{k:'Date',v:fmtTime()}}
-      ]}},content:'',time:fmtTime()}});
-    renderMsgs();toast(`Warn enregistré pour ${{pseudo}}`);
-  }} else if(raw.startsWith('!ban ')){{
-    const pseudo=raw.slice(5).trim();
-    if(!pseudo){{toast('Usage: !ban <pseudo>',false);return;}}
-    const reason=prompt(`Raison du ban pour ${{pseudo}} ?`);
-    if(!reason)return;
-    const duration=prompt('Durée ? (ex: 7 jours, Permanent)');
-    if(!duration)return;
-    const confirm=window.confirm(`Bannir ${{pseudo}} [${{duration}}] pour : ${{reason}} ?`);
-    if(!confirm)return;
-    if(!sanctions[pseudo])sanctions[pseudo]=[];
-    const s={{type:'BAN',by:CU.pseudo,reason,duration,time:fmtTime()}};
-    sanctions[pseudo].push(s);
-    addLog('BAN ROBLOX',CU.pseudo,CU.role,pseudo,`${{reason}} | ${{duration}}`);
-    ms.push({{id:Date.now(),author:'RadiumBot',role:'admin',isBotEmbed:true,
-      embed:{{type:'ban',title:`🔨 BAN — ${{pseudo}}`,fields:[
-        {{k:'Joueur',v:pseudo}},{{k:'Staff',v:CU.pseudo}},{{k:'Durée',v:duration}},{{k:'Raison',v:reason}},{{k:'Date',v:fmtTime()}}
-      ]}},content:'',time:fmtTime()}});
-    renderMsgs();toast(`${{pseudo}} banni (${{duration}})`);
-  }} else if(raw.startsWith('!casiers ')){{
-    const pseudo=raw.slice(9).trim();
-    if(!pseudo){{toast('Usage: !casiers <pseudo>',false);return;}}
-    const cas=sanctions[pseudo]||[];
-    if(!cas.length){{
-      ms.push({{id:Date.now(),author:'RadiumBot',role:'admin',isBotEmbed:true,
-        embed:{{type:'casier',title:`📋 Casier — ${{pseudo}}`,fields:[{{k:'Statut',v:`✅ Le joueur ${{pseudo}} n'a aucun casier pour le moment.`}}]}},
-        content:'',time:fmtTime()}});
-    }} else {{
-      const fields=[{{k:'Joueur',v:pseudo}},{{k:'Total',v:cas.length+' sanction(s)'}}];
-      cas.forEach((s,idx)=>fields.push({{k:`#${{idx+1}} — ${{s.type}}`,v:`Par ${{s.by}} | ${{s.time}}<br>Raison : ${{s.reason}} | Durée : ${{s.duration}}`}}));
-      ms.push({{id:Date.now(),author:'RadiumBot',role:'admin',isBotEmbed:true,
-        embed:{{type:'casier',title:`📋 Casier — ${{pseudo}}`,fields}},content:'',time:fmtTime()}});
-    }}
-    renderMsgs();
-  }} else if(raw.startsWith('!modifcasiers ')){{
-    if(ROLES[CU.role]?.rank<11){{toast('Accès refusé — Réservé Fonda/Co-Fonda/Manager',false);return;}}
-    const pseudo=raw.slice(14).trim();
-    const cas=sanctions[pseudo];
-    if(!cas||!cas.length){{toast(`Aucun casier pour ${{pseudo}}`,false);return;}}
-    const idxStr=prompt(`Casier de ${{pseudo}} (${{cas.length}} sanction(s))\nEntrez le numéro à supprimer (1-${{cas.length}}) ou "raison X nouvelle_raison" pour modifier:`);
-    if(!idxStr)return;
-    if(/^\\d+$/.test(idxStr.trim())){{
-      const idx=parseInt(idxStr)-1;
-      if(idx<0||idx>=cas.length){{toast('Index invalide',false);return;}}
-      sanctions[pseudo].splice(idx,1);
-      addLog('MODIF CASIER',CU.pseudo,CU.role,pseudo,`Suppression sanction #${{idx+1}}`);
-      toast(`Sanction #${{idx+1}} supprimée`);
-    }} else {{
-      toast('Pour modifier la raison, tapez: raison <numéro> <nouvelle raison>');
-    }}
-    renderMsgs();
-  }} else {{
-    toast('Commande inconnue. Utilisez !warn, !ban, !casiers, !modifcasiers',false);
-  }}
-}}
-
-function renderMsgsWithEmbeds(){{
-  const area=document.getElementById('discMsgs');if(!area)return;area.innerHTML='';
-  const ms=msgs[curCh]||[];
-  ms.forEach((m,i)=>{{
-    if(m.isBotEmbed&&m.embed){{
-      const colorMap={{warn:'var(--yellow)',ban:'var(--red)',casier:'var(--purple)'}};
-      const color=colorMap[m.embed.type]||'var(--blue)';
-      area.innerHTML+=`<div class="bot-msg">
-<div class="bot-av">🤖</div>
+function renderBotEmbed(area, m) {
+  const colorMap = { warn:'var(--yellow)', ban:'var(--red)', casier:'var(--purple)', default:'var(--blue)' };
+  const color = colorMap[m.embed.type] || colorMap.default;
+  const el = document.createElement('div'); el.className = 'bot-msg';
+  el.innerHTML = `<div class="bot-av">🤖</div>
 <div style="flex:1">
-<div style="font-weight:800;font-size:12px;color:#88ccff;margin-bottom:6px">RadiumBot <span style="font-size:10px;color:var(--text3)">${{m.time}}</span></div>
-<div class="bot-embed" style="border-left-color:${{color}}">
-<div class="bot-embed-title">${{m.embed.title}}</div>
-${{m.embed.fields.map(f=>`<div class="bot-embed-field"><strong>${{f.k}} :</strong> ${{f.v}}</div>`).join('')}}
-</div>
-</div></div>`;
-    }} else {{
-      const div=document.createElement('div');div.className='msg-item';div.dataset.idx=i;
-      const canDelMsg=canDel(m.role);
-      div.innerHTML=`${{avEl(m.author,m.role,38)}}
-<div class="msg-body">
-<div class="msg-head"><span class="msg-author" style="color:${{rc(m.role)}}">${{m.author}}</span>${{rl(m.role)}}<span class="msg-time">${{m.time}}</span></div>
-<div class="msg-text">${{m.content}}</div>
-</div>
-<div class="msg-actions-btn" onclick="showMsgMenu(event,${{i}},${{canDelMsg}},false)">⋯</div>`;
-      area.appendChild(div);
-    }}
-  }});
-  area.scrollTop=area.scrollHeight;
-}}
+  <div style="font-weight:800;font-size:12px;color:#88ccff;margin-bottom:6px">RadiumBot <span style="font-size:10px;color:var(--text3)">${m.time}</span></div>
+  <div class="bot-embed" style="border-left-color:${color}">
+    <div class="bot-embed-title">${m.embed.title}</div>
+    ${m.embed.fields.map(f => `<div class="bot-embed-field"><strong>${f.k} :</strong> ${f.v}</div>`).join('')}
+  </div>
+</div>`;
+  area.appendChild(el);
+}
 
-// Override renderMsgs for sanction channel
-const _origRenderMsgs=renderMsgs;
-function renderMsgs(){{
-  if(curIsSanction){{renderMsgsWithEmbeds();return;}}
-  _origRenderMsgs();
-}}
+function scrollToMsg(idx) {
+  const area = document.getElementById('discMsgs');
+  const el   = area?.querySelector(`[data-idx="${idx}"]`);
+  if (el) {
+    el.style.background = 'rgba(217,48,48,.12)';
+    el.scrollIntoView({ behavior:'smooth', block:'center' });
+    setTimeout(() => el.style.background = '', 1600);
+  }
+}
 
-// ===== VALIDATION NOM =====
-function renderValidationNom(area){{
-  const pending=nameChangeRequests.filter(r=>r.status==='pending');
-  area.innerHTML='';
-  if(!pending.length){{area.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3)">Aucune demande en attente.</div>';return;}}
-  pending.forEach(req=>{{
-    area.innerHTML+=`<div class="val-card">
-<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-${{avEl(req.user,ACCOUNTS[req.user.toLowerCase()]?.role||'membre',40)}}
-<div>
-<div style="font-weight:700">${{req.user}}</div>
-<div style="font-size:11px;color:var(--text3)">${{req.time}}</div>
+function showMsgMenu(e, i, cd, cr) {
+  e.stopPropagation(); closeAllMenus();
+  const m    = (msgs[curCh] || [])[i];
+  const menu = document.createElement('div'); menu.className = 'msg-menu';
+  // Répondre (toujours)
+  const repBtn = document.createElement('div'); repBtn.className = 'mm-item';
+  repBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 00-4-4H4"/></svg>Répondre`;
+  repBtn.onclick = () => { setReply(i); closeAllMenus(); };
+  menu.appendChild(repBtn);
+  // Supprimer
+  if (cd) {
+    const del = document.createElement('div'); del.className = 'mm-item danger';
+    del.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>Supprimer`;
+    del.onclick = () => { delMsg(i); closeAllMenus(); };
+    menu.appendChild(del);
+    // Bannir (admin+)
+    if (m && CU && (ROLES[CU.role]?.rank || 0) >= 10) {
+      const banBtn = document.createElement('div'); banBtn.className = 'mm-item danger';
+      banBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bannir ${m.author}`;
+      banBtn.onclick = () => { quickBan(m.author); closeAllMenus(); };
+      menu.appendChild(banBtn);
+    }
+  }
+  // Signaler
+  if (cr) {
+    const sigBtn = document.createElement('div'); sigBtn.className = 'mm-item';
+    sigBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>Signaler`;
+    sigBtn.onclick = () => { repIdx = i; openMo('mReport'); closeAllMenus(); };
+    menu.appendChild(sigBtn);
+  }
+  const ex = e.currentTarget.parentElement.querySelector('.msg-menu');
+  if (ex) ex.remove();
+  e.currentTarget.parentElement.appendChild(menu);
+}
+
+function submitReport() {
+  const reason  = document.getElementById('repReason').value;
+  const details = document.getElementById('repDetails').value;
+  const m       = (msgs[curCh] || [])[repIdx];
+  const target  = m ? m.author : 'inconnu';
+  reportMsgs.unshift({ reporter: CU.pseudo, target, reason: reason + (details ? ' — ' + details : ''), channel: curCh, time: fmtTime() });
+  reportCount++;
+  closeMo('mReport'); buildSidebar(); toast('Signalement envoyé au staff');
+}
+
+function delMsg(i) {
+  const tgt = (msgs[curCh] || [])[i]?.author || '?';
+  (msgs[curCh] || []).splice(i, 1);
+  addLog('SUPPRESSION MSG', CU.pseudo, CU.role, tgt, 'Modération');
+  renderMsgs(); toast('Message supprimé');
+}
+
+function sendMsg() {
+  const ed = document.getElementById('msgEd');
+  if (!ed || !ed.innerHTML.trim()) return;
+  if (!CU) { toast('Connectez-vous', false); return; }
+  if (!msgs[curCh]) msgs[curCh] = [];
+  const content = parsePings(ed.innerHTML);
+  const msgObj  = { id: Date.now(), author: CU.pseudo, role: CU.role, content, time: fmtTime(), replyTo: replyTarget ? replyTarget.msgIdx : null };
+  msgs[curCh].push(msgObj);
+  if (replyTarget) {
+    const orig = (msgs[curCh] || [])[replyTarget.msgIdx];
+    if (orig && orig.author !== CU.pseudo) addNotif(orig.author, 'reply', `${CU.pseudo} a répondu à votre message dans #${curCh}`, CU.pseudo, { ch: curCh });
+  }
+  if (CU.msgs != null) CU.msgs++;
+  ed.innerHTML = ''; cancelReply(); renderMsgs();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter') {
+    const ed = document.getElementById('msgEd');
+    if (document.activeElement === ed) sendMsg();
+  }
+});
+
+// =============================================
+// VALIDATION NOM
+// =============================================
+function renderValnom() {
+  const ca = document.getElementById('contentArea');
+  ca.innerHTML = '';
+  const wrap    = document.createElement('div'); wrap.className = 'disc-wrap';
+  const area    = document.createElement('div'); area.className = 'disc-messages'; area.id = 'valnomArea';
+  wrap.appendChild(area);
+  ca.appendChild(wrap);
+  refreshValnom();
+}
+
+function refreshValnom() {
+  const area = document.getElementById('valnomArea'); if (!area) return;
+  const pending = nameChangeRequests.filter(r => r.status === 'pending');
+  area.innerHTML = `<div style="font-weight:800;font-size:16px;margin-bottom:16px">Demandes de changement de pseudo</div>`;
+  if (!pending.length) { area.innerHTML += '<div style="text-align:center;padding:40px;color:var(--text3)">Aucune demande en attente.</div>'; return; }
+  pending.forEach(req => {
+    const acc = ACCOUNTS[req.loginKey];
+    area.innerHTML += `<div class="val-card">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+  ${avEl(req.oldPseudo, acc?.role||'membre', 40)}
+  <div>
+    <div style="font-weight:700">${req.oldPseudo}</div>
+    <div style="font-size:11px;color:var(--text3)">${req.time}</div>
+  </div>
 </div>
-</div>
-<div style="font-size:13px;color:var(--text2);margin-bottom:12px">
-Demande de changement de pseudo :<br>
-<span style="color:var(--text3)">Actuel :</span> <strong>${{req.oldName}}</strong>
-→ <span style="color:var(--text3)">Demandé :</span> <strong style="color:var(--gold)">${{req.newName}}</strong>
+<div style="font-size:13px;color:var(--text2);margin-bottom:14px">
+  Pseudo actuel : <strong>${req.oldPseudo}</strong>
+  &nbsp;→&nbsp;
+  Demandé : <strong style="color:var(--gold)">${req.newPseudo}</strong>
 </div>
 <div style="display:flex;gap:8px">
-<button class="btn-green btn-sm" onclick="validateName('${{req.id}}',true)">✓ Accepter</button>
-<button class="btn-red btn-sm" onclick="validateName('${{req.id}}',false)">✕ Refuser</button>
+  <button class="btn-green btn-sm" onclick="validateName('${req.id}',true)">✓ Accepter</button>
+  <button class="btn-red btn-sm" onclick="validateName('${req.id}',false)">✕ Refuser</button>
 </div>
 </div>`;
-  }});
-}}
-function validateName(id,accept){{
-  const req=nameChangeRequests.find(r=>r.id===id);
-  if(!req)return;
-  req.status=accept?'accepted':'refused';
-  if(accept){{
-    const acc=ACCOUNTS[req.user.toLowerCase()];
-    if(acc)acc.pseudo=req.newName;
-    // Update if it's current user
-    if(CU&&CU.loginKey===req.user.toLowerCase())CU.pseudo=req.newName;
-    addNotif(req.user,'name_change',`Votre demande de changement de pseudo vers "${{req.newName}}" a été acceptée !`,CU.pseudo,{{}});
-    toast('Pseudo changé : '+req.newName);
-  }} else {{
-    addNotif(req.user,'name_change',`Votre demande de changement de pseudo vers "${{req.newName}}" a été refusée.`,CU.pseudo,{{}});
+  });
+}
+
+function validateName(id, accept) {
+  const req = nameChangeRequests.find(r => r.id === id);
+  if (!req) return;
+  req.status = accept ? 'accepted' : 'refused';
+  if (accept) {
+    const acc = ACCOUNTS[req.loginKey];
+    if (acc) acc.pseudo = req.newPseudo;
+    if (CU && CU.loginKey === req.loginKey) CU.pseudo = req.newPseudo;
+    addNotif(req.oldPseudo, 'name', `Votre demande de pseudo "${req.newPseudo}" a été acceptée !`, CU.pseudo, {});
+    toast('Pseudo changé : ' + req.newPseudo);
+  } else {
+    addNotif(req.oldPseudo, 'name', `Votre demande de pseudo "${req.newPseudo}" a été refusée.`, CU.pseudo, {});
     toast('Demande refusée');
-  }}
-  buildSidebar();
-  // Re-render
-  const area=document.getElementById('discMsgs');
-  if(area)renderValidationNom(area);
-}}
+  }
+  buildSidebar(); refreshValnom();
+}
 
-// ===== PROFILE =====
-function renderProfile(ca){{
-  ca=ca||document.getElementById('contentArea');
-  const r=ROLES[CU.role]||ROLES.membre;
-  const avContent=CU.avatar?`<img src="${{CU.avatar}}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:(CU.pseudo[0]||'?').toUpperCase();
-  ca.innerHTML=`<div class="profile-page">
-<div class="prof-banner"></div>
-<div class="prof-av-wrap"><div class="prof-av ${{r.avCls}}" style="color:${{r.color}}">${{avContent}}</div></div>
+// =============================================
+// SANCTION JOUEUR (BOT)
+// =============================================
+function renderSanction() {
+  const ca = document.getElementById('contentArea');
+  ca.innerHTML = '';
+  const wrap    = document.createElement('div'); wrap.className = 'disc-wrap';
+  const area    = document.createElement('div'); area.className = 'disc-messages'; area.id = 'discMsgs';
+  wrap.appendChild(area);
+  if (isStaff()) {
+    const inp = document.createElement('div'); inp.className = 'disc-input';
+    inp.innerHTML = `
+<div style="font-size:11px;color:var(--text3);margin-bottom:6px">
+  Commandes : 
+  <code style="background:var(--bg4);padding:1px 5px;border-radius:3px">!warn &lt;pseudo&gt;</code>
+  <code style="background:var(--bg4);padding:1px 5px;border-radius:3px">!ban &lt;pseudo&gt;</code>
+  <code style="background:var(--bg4);padding:1px 5px;border-radius:3px">!casiers &lt;pseudo&gt;</code>
+  <code style="background:var(--bg4);padding:1px 5px;border-radius:3px">!modifcasiers &lt;pseudo&gt;</code>
+</div>
+<div class="editor-wrap">
+  <div class="editor-body" id="cmdEd" contenteditable="true" data-placeholder="Tapez une commande... ex: !warn PseudoRoblox" style="min-height:40px;max-height:60px;font-family:monospace;font-size:13px"></div>
+  <div class="editor-footer"><span></span><button class="btn-red btn-sm" onclick="handleBotCmd()">Envoyer</button></div>
+</div>`;
+    wrap.appendChild(inp);
+  }
+  ca.appendChild(wrap);
+  // Afficher l'historique des sanctions
+  const ms = msgs['Sanction Joueur'] || [];
+  if (!ms.length) { area.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Aucune sanction enregistrée.</div>'; return; }
+  ms.forEach(m => {
+    if (m.isBotEmbed && m.embed) renderBotEmbed(area, m);
+  });
+  area.scrollTop = area.scrollHeight;
+}
+
+function handleBotCmd() {
+  const ed  = document.getElementById('cmdEd');
+  if (!ed || !ed.innerText.trim()) return;
+  const raw = ed.innerText.trim();
+  ed.innerHTML = '';
+  if (!msgs['Sanction Joueur']) msgs['Sanction Joueur'] = [];
+  const ms = msgs['Sanction Joueur'];
+
+  if (raw.startsWith('!warn ')) {
+    const pseudo = raw.slice(6).trim();
+    if (!pseudo) { toast('Usage : !warn <pseudo>', false); return; }
+    const reason = prompt(`Raison du warn pour ${pseudo} ?`);
+    if (!reason) return;
+    if (!sanctions[pseudo]) sanctions[pseudo] = [];
+    sanctions[pseudo].push({ type:'WARN', by:CU.pseudo, reason, duration:'—', time:fmtTime() });
+    addLog('WARN', CU.pseudo, CU.role, pseudo, reason);
+    ms.push({ id:Date.now(), isBotEmbed:true, embed:{type:'warn', title:`⚠️ WARN — ${pseudo}`,
+      fields:[{k:'Joueur',v:pseudo},{k:'Staff',v:CU.pseudo},{k:'Raison',v:reason},{k:'Date',v:fmtTime()}]}, time:fmtTime() });
+    renderSanction(); toast(`Warn enregistré pour ${pseudo}`);
+
+  } else if (raw.startsWith('!ban ')) {
+    const pseudo = raw.slice(5).trim();
+    if (!pseudo) { toast('Usage : !ban <pseudo>', false); return; }
+    const reason   = prompt(`Raison du ban pour ${pseudo} ?`);
+    if (!reason) return;
+    const duration = prompt('Durée ? (ex : 7 jours, Permanent)');
+    if (!duration) return;
+    if (!confirm(`Bannir ${pseudo} [${duration}] pour : ${reason} ?`)) return;
+    if (!sanctions[pseudo]) sanctions[pseudo] = [];
+    sanctions[pseudo].push({ type:'BAN', by:CU.pseudo, reason, duration, time:fmtTime() });
+    addLog('BAN ROBLOX', CU.pseudo, CU.role, pseudo, `${reason} | ${duration}`);
+    ms.push({ id:Date.now(), isBotEmbed:true, embed:{type:'ban', title:`🔨 BAN — ${pseudo}`,
+      fields:[{k:'Joueur',v:pseudo},{k:'Staff',v:CU.pseudo},{k:'Durée',v:duration},{k:'Raison',v:reason},{k:'Date',v:fmtTime()}]}, time:fmtTime() });
+    renderSanction(); toast(`${pseudo} banni (${duration})`);
+
+  } else if (raw.startsWith('!casiers ')) {
+    const pseudo = raw.slice(9).trim();
+    if (!pseudo) { toast('Usage : !casiers <pseudo>', false); return; }
+    const cas = sanctions[pseudo] || [];
+    let fields;
+    if (!cas.length) {
+      fields = [{k:'Statut', v:`✅ ${pseudo} n'a aucun casier.`}];
+    } else {
+      fields = [{k:'Joueur',v:pseudo},{k:'Total',v:cas.length+' sanction(s)'}];
+      cas.forEach((s, idx) => fields.push({k:`#${idx+1} — ${s.type}`, v:`Par ${s.by} | ${s.time}<br>Raison : ${s.reason} | Durée : ${s.duration}`}));
+    }
+    ms.push({ id:Date.now(), isBotEmbed:true, embed:{type:'casier', title:`📋 Casier — ${pseudo}`, fields}, time:fmtTime() });
+    renderSanction();
+
+  } else if (raw.startsWith('!modifcasiers ')) {
+    if ((ROLES[CU.role]?.rank || 0) < 11) { toast('Accès refusé — Réservé Fonda/Co-Fonda/Manager', false); return; }
+    const pseudo = raw.slice(14).trim();
+    const cas    = sanctions[pseudo];
+    if (!cas || !cas.length) { toast(`Aucun casier pour ${pseudo}`, false); return; }
+    const input = prompt(`Casier de ${pseudo} (${cas.length} sanction(s))\nEntrez le numéro à supprimer (1–${cas.length}) :`);
+    if (!input) return;
+    const idx = parseInt(input) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= cas.length) { toast('Numéro invalide', false); return; }
+    sanctions[pseudo].splice(idx, 1);
+    addLog('MODIF CASIER', CU.pseudo, CU.role, pseudo, `Suppression sanction #${idx+1}`);
+    toast(`Sanction #${idx+1} supprimée`);
+    renderSanction();
+
+  } else {
+    toast('Commande inconnue. Essayez !warn, !ban, !casiers, !modifcasiers', false);
+  }
+}
+
+// =============================================
+// PROFIL
+// =============================================
+function renderProfile(ca) {
+  ca = ca || document.getElementById('contentArea');
+  const rd = ROLES[CU.role] || ROLES.membre;
+  const avInner = CU.avatar
+    ? `<img src="${CU.avatar}" alt="">`
+    : (CU.pseudo[0] || '?').toUpperCase();
+  ca.innerHTML = `<div class="profile-page">
+<div class="prof-banner-bg"></div>
+<div class="prof-av-wrap">
+  <div class="prof-av ${rd.avCls}" style="color:${rd.color}">${avInner}</div>
+</div>
 <div style="padding:0 0 20px">
-<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
-<div>
-<div style="font-weight:900;font-size:22px">${{CU.pseudo}}</div>
-<div style="margin-top:5px">${{rl(CU.role)}}</div>
-</div>
-<div style="display:flex;gap:8px">
-<button class="btn-outline btn-sm" onclick="openEditProf()">Modifier</button>
-<button class="btn-outline btn-sm" onclick="logout()">Déconnexion</button>
-</div>
-</div>
-<div style="font-size:13px;color:var(--text2);margin:8px 0 14px;line-height:1.5">${{CU.bio||'<em style="color:var(--text3)">Aucune bio.</em>'}}</div>
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--red)">${{CU.msgs||0}}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:2px">Messages</div></div>
-<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--red)">${{CU.posts||0}}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:2px">Posts</div></div>
-<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-size:14px;font-weight:800;color:var(--red)">${{CU.joined}}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:2px">Inscrit</div></div>
-</div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">
+    <div>
+      <div style="font-weight:900;font-size:22px">${CU.pseudo}</div>
+      <div style="margin-top:5px">${rl(CU.role)}</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-outline btn-sm" onclick="openEditProf()">Modifier le profil</button>
+      <button class="btn-outline btn-sm" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+  <div style="font-size:13px;color:var(--text2);margin:8px 0 14px;line-height:1.5">${CU.bio || '<em style="color:var(--text3)">Aucune bio renseignée.</em>'}</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--red)">${CU.msgs || 0}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:2px">Messages</div></div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--red)">${CU.posts || 0}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:2px">Posts</div></div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-size:14px;font-weight:800;color:var(--red)">${CU.joined}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:2px">Inscrit</div></div>
+  </div>
 </div>
 </div>`;
-}}
+}
 
-function openEditProf(){{
-  const prev=document.getElementById('editAvPrev');
-  prev.innerHTML=CU.avatar?`<img src="${{CU.avatar}}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:(CU.pseudo[0]||'?').toUpperCase();
-  prev.style.color=(ROLES[CU.role]||{{color:'#aaa'}}).color;
-  document.getElementById('editPseudo').value=CU.pseudo;
-  document.getElementById('editBio').value=CU.bio||'';
-  document.getElementById('nameChangeNote').style.display='none';
+function openEditProf() {
+  const prev = document.getElementById('editAvPrev');
+  prev.innerHTML = CU.avatar
+    ? `<img src="${CU.avatar}" alt="">`
+    : (CU.pseudo[0] || '?').toUpperCase();
+  prev.style.color = (ROLES[CU.role] || {color:'#aaa'}).color;
+  document.getElementById('editPseudo').value = CU.pseudo;
+  document.getElementById('editBio').value    = CU.bio || '';
+  document.getElementById('nameChangeNote').style.display = 'none';
   openMo('mEditProfile');
-}}
-document.getElementById('editPseudo').addEventListener('input',function(){{
-  document.getElementById('nameChangeNote').style.display=this.value!==CU.pseudo?'block':'none';
-}});
-function prevAv(input){{
-  if(input.files&&input.files[0]){{
-    const r2=new FileReader();
-    r2.onload=e=>{{
-      document.getElementById('editAvPrev').innerHTML=`<img src="${{e.target.result}}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-      CU._tempAv=e.target.result;
-    }};
-    r2.readAsDataURL(input.files[0]);
-  }}
-}}
-function saveProf(){{
-  const newPseudo=document.getElementById('editPseudo').value.trim();
-  const bio=document.getElementById('editBio').value.trim();
-  if(!newPseudo){{toast('Pseudo requis',false);return;}}
-  if(CU._tempAv){{CU.avatar=CU._tempAv;ACCOUNTS[CU.loginKey].avatar=CU.avatar;delete CU._tempAv;}}
-  CU.bio=bio;ACCOUNTS[CU.loginKey].bio=bio;
-  if(newPseudo!==CU.pseudo){{
-    // Create name change request
-    const req={{id:'nc_'+Date.now(),user:CU.pseudo,oldName:CU.pseudo,newName:newPseudo,time:fmtTime(),status:'pending'}};
+}
+
+document.getElementById('editPseudo').addEventListener('input', function() {
+  document.getElementById('nameChangeNote').style.display = this.value !== CU?.pseudo ? 'block' : 'none';
+});
+
+function prevAv(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('editAvPrev').innerHTML = `<img src="${e.target.result}" alt="">`;
+      CU._tempAv = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function saveProf() {
+  const newPseudo = document.getElementById('editPseudo').value.trim();
+  const bio       = document.getElementById('editBio').value.trim();
+  if (!newPseudo) { toast('Pseudo requis', false); return; }
+  // Sauvegarder avatar et bio immédiatement
+  if (CU._tempAv) {
+    CU.avatar = CU._tempAv;
+    ACCOUNTS[CU.loginKey].avatar = CU.avatar;
+    delete CU._tempAv;
+  }
+  CU.bio = bio;
+  ACCOUNTS[CU.loginKey].bio = bio;
+  // Changement de pseudo → demande de validation
+  if (newPseudo !== CU.pseudo) {
+    const req = { id: 'nc_' + Date.now(), loginKey: CU.loginKey, oldPseudo: CU.pseudo, newPseudo, time: fmtTime(), status: 'pending' };
     nameChangeRequests.push(req);
-    // Notify staff
+    buildSidebar();
     toast('Demande de changement de pseudo envoyée aux staff !');
-    // Add to Validation Nom channel
-    if(!msgs['Validation Nom'])msgs['Validation Nom']=[];
-    msgs['Validation Nom'].push({{id:Date.now(),author:'RadiumBot',role:'admin',content:`Nouvelle demande de changement de pseudo de <strong>${{CU.pseudo}}</strong> vers <strong>${{newPseudo}}</strong>`,time:fmtTime()}});
-  }} else {{
+  } else {
     toast('Profil mis à jour !');
-  }}
-  closeMo('mEditProfile');renderProfile();buildSidebar();
-}}
+  }
+  closeMo('mEditProfile'); renderProfile(); buildSidebar();
+}
 
-// ===== NOTIFICATIONS =====
-function renderNotifs(ca){{
-  // Mark all as read
-  if(CU)notifsList.filter(n=>n.to===CU.pseudo).forEach(n=>n.read=true);
+// =============================================
+// NOTIFICATIONS
+// =============================================
+function renderNotifs(ca) {
+  if (CU) notifsList.filter(n => n.to === CU.pseudo).forEach(n => n.read = true);
   updateNotifBadge();
-  const myNotifs=notifsList.filter(n=>n.to===CU.pseudo);
-  ca.innerHTML=`<div style="padding:24px">
+  const mine = notifsList.filter(n => n.to === CU.pseudo);
+  const iconFor = type => type === 'ping' ? '@' : type === 'reply' ? '↩' : '✓';
+  const colorFor = type => type === 'ping' ? 'var(--gold)' : type === 'reply' ? 'var(--blue)' : 'var(--green)';
+  ca.innerHTML = `<div style="padding:24px">
 <div style="font-weight:800;font-size:18px;margin-bottom:16px">Notifications</div>
-${{!myNotifs.length?'<div style="text-align:center;padding:40px;color:var(--text3)">Aucune notification.</div>':
-myNotifs.map(n=>{{
-  const icon=n.type==='ping'?'@':n.type==='reply'?'↩':'✓';
-  const color=n.type==='ping'?'var(--gold)':n.type==='reply'?'var(--blue)':'var(--green)';
-  return`<div class="notif-item${{n.read?'':' unread'}}">
-${{!n.read?'<div class="notif-dot-ind"></div>':''}}
-<div style="width:32px;height:32px;border-radius:50%;background:${{color}}22;border:1px solid ${{color}}55;display:flex;align-items:center;justify-content:center;font-weight:900;color:${{color}};flex-shrink:0">${{icon}}</div>
-<div>
-<div style="font-size:13px;color:var(--text)">${{n.text}}</div>
-<div style="font-size:11px;color:var(--text3);margin-top:3px">${{n.time}}</div>
-</div>
+${!mine.length
+  ? '<div style="text-align:center;padding:40px;color:var(--text3)">Aucune notification.</div>'
+  : mine.map(n => `<div class="notif-item${n.read ? '' : ' unread'}">
+  ${!n.read ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px"></div>' : ''}
+  <div style="width:32px;height:32px;border-radius:50%;background:${colorFor(n.type)}22;border:1px solid ${colorFor(n.type)}55;display:flex;align-items:center;justify-content:center;font-weight:900;color:${colorFor(n.type)};flex-shrink:0">${iconFor(n.type)}</div>
+  <div style="flex:1;min-width:0">
+    <div style="font-size:13px;color:var(--text)">${n.text}</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:3px">${n.time}</div>
+  </div>
+</div>`).join('')}
 </div>`;
-}}).join('')}}
-</div>`;
-}}
+}
 
-// ===== ADMIN =====
-function renderAdmin(ca){{
-  ca=ca||document.getElementById('contentArea');
-  if(!CU||ROLES[CU.role]?.rank<12){{ca.innerHTML='<div style="padding:40px;text-align:center;color:var(--text3)">Accès refusé.</div>';return;}}
-  ca.innerHTML=`<div class="admin-page">
-<div class="admin-header"><h1 style="font-size:22px;font-weight:900">Panneau Admin</h1><p style="font-size:12px;color:var(--gold);margin-top:2px">Radium ZONE-21 — Fondateur</p></div>
+// =============================================
+// ADMIN
+// =============================================
+function renderAdmin(ca) {
+  ca = ca || document.getElementById('contentArea');
+  if (!CU || (ROLES[CU.role]?.rank || 0) < 12) {
+    ca.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3)">Accès refusé.</div>'; return;
+  }
+  ca.innerHTML = `<div class="admin-page">
+<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)">
+  <div style="font-size:22px;font-weight:900">Panneau Admin</div>
+  <div style="font-size:12px;color:var(--gold);margin-top:2px">Radium ZONE-21</div>
+</div>
 <div class="admin-grid">
-<div class="admin-card-btn" onclick="openMo('mBan')"><svg viewBox="0 0 24 24" fill="none" stroke="#ff8888" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg><div class="admin-card-btn-label">Bannir</div></div>
-<div class="admin-card-btn" onclick="doUnban()"><svg viewBox="0 0 24 24" fill="none" stroke="#88ff88" stroke-width="2"><path d="M9 12l2 2 4-4"/></svg><div class="admin-card-btn-label">Débannir</div></div>
-<div class="admin-card-btn" onclick="openMo('mRole')"><svg viewBox="0 0 24 24" fill="none" stroke="#f0c040" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="admin-card-btn-label">Rôles</div></div>
-<div class="admin-card-btn" onclick="nav('logs')"><svg viewBox="0 0 24 24" fill="none" stroke="#88ccff" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="admin-card-btn-label">Logs</div></div>
+  <div class="admin-card-btn" onclick="openMo('mBan')"><svg viewBox="0 0 24 24" fill="none" stroke="#ff8888" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg><div class="admin-card-btn-label">Bannir</div></div>
+  <div class="admin-card-btn" onclick="doUnban()"><svg viewBox="0 0 24 24" fill="none" stroke="#88ff88" stroke-width="2"><path d="M9 12l2 2 4-4"/></svg><div class="admin-card-btn-label">Débannir</div></div>
+  <div class="admin-card-btn" onclick="openMo('mRole')"><svg viewBox="0 0 24 24" fill="none" stroke="#f0c040" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="admin-card-btn-label">Rôles</div></div>
+  <div class="admin-card-btn" onclick="nav('logs')"><svg viewBox="0 0 24 24" fill="none" stroke="#88ccff" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="admin-card-btn-label">Logs</div></div>
 </div>
 <div style="margin-bottom:20px">
-<div class="admin-section-title">Membres inscrits (${{Object.keys(ACCOUNTS).length}})</div>
-<div class="member-table">
-${{Object.entries(ACCOUNTS).map(([key,acc])=>`<div class="mt-row">
-${{avEl(acc.pseudo,acc.role,36)}}
-<div><div style="font-weight:700;font-size:13px">${{acc.pseudo}}</div><div style="margin-top:3px">${{rl(acc.role)}}</div></div>
-<div style="display:flex;gap:6px"><button class="mt-btn mt-btn-ban" onclick="quickBan('${{acc.pseudo}}')">Bannir</button></div>
-<div style="display:flex;gap:6px"><button class="mt-btn mt-btn-role" onclick="openRoleFor('${{key}}')">Rôle</button></div>
-</div>`).join('')}}
-</div>
+  <div class="sec-title">Membres inscrits (${Object.keys(ACCOUNTS).length})</div>
+  <div class="member-table">
+    ${Object.entries(ACCOUNTS).map(([key, acc]) => `<div class="mt-row">
+      ${avEl(acc.pseudo, acc.role, 36)}
+      <div><div style="font-weight:700;font-size:13px">${acc.pseudo}</div><div style="margin-top:3px">${rl(acc.role)}</div></div>
+      <div><button class="mt-btn mt-btn-ban" onclick="quickBan('${acc.pseudo}','${key}')">Bannir</button></div>
+      <div><button class="mt-btn mt-btn-role" onclick="openRoleFor('${key}')">Rôle</button></div>
+    </div>`).join('')}
+  </div>
 </div>
 <div>
-<div class="admin-section-title">Bannis (${{banList.length}})</div>
-<div class="member-table" id="banListEl">
-${{!banList.length?'<div style="padding:14px;text-align:center;color:var(--text3)">Aucun banni.</div>':''}}</div>
+  <div class="sec-title">Bannis (${banList.length})</div>
+  <div class="member-table" id="banListEl">${!banList.length ? '<div style="padding:14px;text-align:center;color:var(--text3)">Aucun banni.</div>' : ''}</div>
 </div>
 </div>`;
   updateBanList();
-}}
+}
 
-function confirmBan(){{
-  const target=document.getElementById('banTarget').value.trim();
-  const reason=document.getElementById('banReason').value.trim()||'Aucune raison';
-  if(!target){{toast('Pseudo requis',false);return;}}
-  // Find account by pseudo
-  const key=Object.keys(ACCOUNTS).find(k=>ACCOUNTS[k].pseudo===target||k===target.toLowerCase());
-  if(key){{ACCOUNTS[key].role='banni';}}
-  if(!banList.find(b=>b.target===target))banList.push({{target,reason,actor:CU.pseudo,date:new Date().toLocaleDateString('fr-FR')}});
-  addLog('BAN FORUM',CU.pseudo,CU.role,target,reason);
-  closeMo('mBan');document.getElementById('banTarget').value='';document.getElementById('banReason').value='';
-  updateBanList();toast(target+' banni !');
-}}
-function doUnban(){{
-  const t=prompt('Pseudo à débannir :');if(!t)return;
-  const i=banList.findIndex(b=>b.target===t);if(i>=0)banList.splice(i,1);
-  const key=Object.keys(ACCOUNTS).find(k=>ACCOUNTS[k].pseudo===t||k===t.toLowerCase());
-  if(key)ACCOUNTS[key].role='membre';
-  addLog('DEBAN',CU.pseudo,CU.role,t,'Débanni');updateBanList();toast(t+' débanni !');
-}}
-function updateBanList(){{
-  const el=document.getElementById('banListEl');if(!el)return;
-  if(!banList.length){{el.innerHTML='<div style="padding:14px;text-align:center;color:var(--text3)">Aucun banni.</div>';return;}}
-  el.innerHTML=banList.map(b=>`<div class="mt-row">
-<div style="width:36px;height:36px;border-radius:50%;background:rgba(100,0,0,.3);display:flex;align-items:center;justify-content:center;border:2px solid #660000;font-size:18px">🚫</div>
-<div><div style="font-weight:700;font-size:13px">${{b.target}}</div><div style="font-size:11px;color:var(--red);margin-top:2px">Par ${{b.actor}} · ${{b.reason}}</div></div>
+function confirmBan() {
+  const targetPseudo = document.getElementById('banTarget').value.trim();
+  const reason       = document.getElementById('banReason').value.trim() || 'Aucune raison';
+  if (!targetPseudo) { toast('Pseudo requis', false); return; }
+  const key = Object.keys(ACCOUNTS).find(k => ACCOUNTS[k].pseudo === targetPseudo || k === targetPseudo.toLowerCase());
+  if (key) ACCOUNTS[key].role = 'banni';
+  if (!banList.find(b => b.targetPseudo === targetPseudo)) {
+    banList.push({ targetPseudo, targetKey: key || null, reason, actor: CU.pseudo, date: new Date().toLocaleDateString('fr-FR') });
+  }
+  addLog('BAN FORUM', CU.pseudo, CU.role, targetPseudo, reason);
+  closeMo('mBan');
+  document.getElementById('banTarget').value = '';
+  document.getElementById('banReason').value = '';
+  updateBanList(); toast(targetPseudo + ' banni !');
+}
+
+function doUnban() {
+  const t = prompt('Pseudo à débannir :'); if (!t) return;
+  const i = banList.findIndex(b => b.targetPseudo === t); if (i >= 0) banList.splice(i, 1);
+  const key = Object.keys(ACCOUNTS).find(k => ACCOUNTS[k].pseudo === t || k === t.toLowerCase());
+  if (key) ACCOUNTS[key].role = 'membre';
+  addLog('DEBAN', CU.pseudo, CU.role, t, 'Débanni'); updateBanList(); toast(t + ' débanni !');
+}
+
+function updateBanList() {
+  const el = document.getElementById('banListEl'); if (!el) return;
+  if (!banList.length) { el.innerHTML = '<div style="padding:14px;text-align:center;color:var(--text3)">Aucun banni.</div>'; return; }
+  el.innerHTML = banList.map(b => `<div class="mt-row">
+<div class="av av-b-banni" style="width:36px;height:36px;font-size:18px">🚫</div>
+<div><div style="font-weight:700;font-size:13px">${b.targetPseudo}</div><div style="font-size:11px;color:var(--red);margin-top:2px">Par ${b.actor} · ${b.reason}</div></div>
 <div></div>
-<div><button class="mt-btn mt-btn-unban" onclick="unbanSpec('${{b.target}}')">Débannir</button></div>
+<div><button class="mt-btn mt-btn-unban" onclick="unbanSpec('${b.targetPseudo}','${b.targetKey||''}')">Débannir</button></div>
 </div>`).join('');
-}}
-function unbanSpec(t){{
-  const i=banList.findIndex(b=>b.target===t);if(i>=0)banList.splice(i,1);
-  const key=Object.keys(ACCOUNTS).find(k=>ACCOUNTS[k].pseudo===t||k===t.toLowerCase());
-  if(key)ACCOUNTS[key].role='membre';
-  addLog('DEBAN',CU.pseudo,CU.role,t,'Débanni depuis panneau');updateBanList();toast(t+' débanni');
-}}
-function quickBan(n){{document.getElementById('banTarget').value=n;openMo('mBan');}}
-function openRoleFor(key){{document.getElementById('roleTarget').value=key;openMo('mRole');}}
-function confirmRole(){{
-  const key=document.getElementById('roleTarget').value.trim().toLowerCase();
-  const role=document.getElementById('roleSelect').value;
-  if(!key||!ACCOUNTS[key]){{toast('Pseudo introuvable',false);return;}}
-  ACCOUNTS[key].role=role;
-  if(CU&&CU.loginKey===key)CU.role=role;
-  addLog('ROLE',CU.pseudo,CU.role,ACCOUNTS[key].pseudo,'→ '+(ROLES[role]?.label||role));
-  closeMo('mRole');buildSidebar();toast('Rôle mis à jour');
-}}
+}
 
-// ===== LOGS =====
-const AC={{'BAN FORUM':'#ff6666','BAN ROBLOX':'#ff4444','DEBAN':'#66ff88','TAG':'#88ccff','ROLE':'#cc88ff','WARN':'#f0c040','MODIF CASIER':'#aaaaff','SUPPRESSION MSG':'#f0c040'}};
-function addLog(action,actor,actorRole,target,reason){{
-  logsList.unshift({{time:fmtTime(),action,actor,actorRole,target,reason}});
-}}
-function renderLogs(){{
-  const el=document.getElementById('logsEl');if(!el)return;
-  el.innerHTML=logsList.length?logsList.map(l=>`<div class="log-entry">
-<span style="color:var(--text3)">[${{l.time}}]</span>
-<span style="color:${{AC[l.action]||'var(--red)'}}"> ${{l.action}}</span>
-&nbsp;·&nbsp;par <strong style="color:${{rc(l.actorRole)}}">${{l.actor}}</strong>
-&nbsp;·&nbsp;cible : <span style="color:var(--blue)">${{l.target}}</span>
-&nbsp;·&nbsp;<span style="color:var(--text2)">${{l.reason}}</span>
-</div>`).join(''):'<div style="padding:20px;text-align:center;color:var(--text3)">Aucun log.</div>';
-}}
+function unbanSpec(pseudo, key) {
+  const i = banList.findIndex(b => b.targetPseudo === pseudo); if (i >= 0) banList.splice(i, 1);
+  if (key && ACCOUNTS[key]) ACCOUNTS[key].role = 'membre';
+  addLog('DEBAN', CU.pseudo, CU.role, pseudo, 'Débanni depuis le panneau'); updateBanList(); toast(pseudo + ' débanni');
+}
 
-// ===== MOBILE =====
-function toggleSidebar(){{document.getElementById('sidebar').classList.toggle('open');document.getElementById('mobileOverlay').classList.toggle('show');}}
-function closeSidebar(){{document.getElementById('sidebar').classList.remove('open');document.getElementById('mobileOverlay').classList.remove('show');}}
+function quickBan(pseudo, key) {
+  document.getElementById('banTarget').value = pseudo;
+  openMo('mBan');
+}
 
-// ===== INIT =====
+function openRoleFor(key) {
+  document.getElementById('roleTarget').value = key;
+  openMo('mRole');
+}
+
+function confirmRole() {
+  const key  = document.getElementById('roleTarget').value.trim().toLowerCase();
+  const role = document.getElementById('roleSelect').value;
+  if (!key || !ACCOUNTS[key]) { toast('Login introuvable', false); return; }
+  ACCOUNTS[key].role = role;
+  if (CU && CU.loginKey === key) CU.role = role;
+  addLog('ROLE', CU.pseudo, CU.role, ACCOUNTS[key].pseudo, '→ ' + (ROLES[role]?.label || role));
+  closeMo('mRole'); buildSidebar(); toast('Rôle mis à jour');
+}
+
+// =============================================
+// LOGS
+// =============================================
+const LOG_COLORS = {'BAN FORUM':'#ff6666','BAN ROBLOX':'#ff4444','DEBAN':'#66ff88','SUPPRESSION MSG':'#f0c040','TAG':'#88ccff','ROLE':'#cc88ff','WARN':'#f0c040','MODIF CASIER':'#aaaaff'};
+
+function addLog(action, actor, actorRole, target, reason) {
+  logsList.unshift({ time: fmtTime(), action, actor, actorRole, target, reason });
+}
+
+function renderLogs() {
+  const el = document.getElementById('logsEl'); if (!el) return;
+  el.innerHTML = logsList.length
+    ? logsList.map(l => `<div class="log-entry">
+<span style="color:var(--text3)">[${l.time}]</span>
+<span style="color:${LOG_COLORS[l.action]||'var(--red)'}"> ${l.action}</span>
+&nbsp;·&nbsp; par <strong style="color:${rc(l.actorRole)}">${l.actor}</strong>
+&nbsp;·&nbsp; cible : <span style="color:var(--blue)">${l.target}</span>
+&nbsp;·&nbsp; <span style="color:var(--text2)">${l.reason}</span>
+</div>`).join('')
+    : '<div style="padding:20px;text-align:center;color:var(--text3)">Aucun log.</div>';
+}
+
+// =============================================
+// MOBILE
+// =============================================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+}
+
+// =============================================
+// INIT — afficher la page de connexion
+// =============================================
 buildSidebar();
-// Show login gate on start — no auto-login
-document.getElementById('loginGate').style.display='flex';
+document.getElementById('loginGate').style.display = 'flex';
+// L'app principale reste cachée derrière le login gate
 </script>
 </body>
-</html>'''
+</html>
+JSEOF
+wc -c /tmp/forum_js.js
+Sortie
 
-with open('/mnt/user-data/outputs/radium_forum_v2.html','w',encoding='utf-8') as f:
-    f.write(HTML)
-print("Done:", len(HTML), "chars")
-BUILDEOF
-python3 /tmp/build_forum.py
+73838 /tmp/forum_js.js
